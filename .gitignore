@@ -1,0 +1,23 @@
+#ignore server data
+/servers/
+#ignore tools
+/bin
+/luvit64
+/luvit-rasp
+/luvi64
+/luvi-rasp
+/lit64
+/lit-rasp
+#dont match the token file
+/token
+#dont match dependencies
+/deps/
+#dont match todo list
+/todo/
+#dont match dkjson
+/libraries/dkjson.lua
+#and dont match stuff that is practically useless
+*.log
+/discordia.log
+/gateway.json
+/invite
