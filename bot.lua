@@ -192,9 +192,15 @@ function Server:start()
       end
     end
   end)
+  local server_save_counter = 0
   client:on("messageCreate",function(msg)
-    if msg.content == self.config.prefix.."save" then
-      self.save_data(self)
+    if msg.guild.id == self.id then
+      server_save_counter = server_save_counter + 1
+      if server_save_counter > 25 then
+        self.log("INFO","Saving server configs")
+        self.save_data(self)
+        server_save_counter = 0
+      end
     end
   end)
 end
@@ -206,7 +212,7 @@ client:on("ready",function()
       os.execute("mkdir -p ./servers/"..v.id)
       servers[v.id] = Server:new(v.id)
       servers[v.id]:start()
-      client:emit("serverLoaded",guild)
+      client:emit("serverLoaded",v)
     end
   end
   require("bot_repl")({
@@ -225,6 +231,27 @@ client:on("shutdown",function()
     v.log:close()
   end
   os.exit()
+end)
+
+client:on("guildCreate",function(guild)
+  os.execute("mkdir -p ./servers/"..guild.id)
+  servers[guild.id] = Server:new(guild.id)
+  servers[guild.id]:start()
+  client:emit("serverLoaded",guild)
+end)
+
+client:on("guildDelete",function(guild)
+  if not servers[guild.id] then
+    return
+  end
+  servers[guild.id].log("INFO","Removing server object")
+  for k,v in pairs(servers[guild.id].plugins) do
+    servers[guild.id]:unload_plugin(k)
+  end
+  servers[guild.id].log:close()
+  for k,v in pairs(servers[guild.id].signals.handlers) do
+    servers[guild.id].signals:removeAllListeners(k)
+  end
 end)
 
 local tempfile = io.open("./token","r")
