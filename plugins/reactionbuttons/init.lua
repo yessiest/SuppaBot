@@ -1,4 +1,8 @@
 local segment = {}
+local emulate = require("emulate")({
+  client = client,
+  discordia = discordia,
+})
 local guild = client:getGuild(id)
 segment.pivots = require("file").readJSON("./servers/"..id.."/reactions.json",{})
 local getEmoji = function(id)
@@ -133,64 +137,175 @@ segment.commands = {
         msg:reply("Pivot successfully removed")
       end
     end
-  }
-
+  },
+  ["toggle"] = {
+    help = {
+      title = "Add a toggle that runs specific commands",
+      description = "Note: you cannot assign more than one action to a single reaction \n``$user`` gets replaced with the id of the user that interacted with the reaction.",
+      fields = {
+        {name = "Usage: ",value = "toggle <emoji> <command-on> <command-off>"},
+        {name = "Perms: ",value = "administrator"}
+      }
+    },
+    args = {
+      "string",
+      "string",
+      "string",
+    },
+    perms = {
+      perms = {
+        "administrator"
+      }
+    },
+    exec = function(msg,args,opts)
+      if not segment.pivot then
+        msg:reply("Pivot not selected. Use "..globals.prefix.."pivot to select it and then try again")
+        return nil
+      end
+      local emoji = getEmoji(args[1])
+      local channel = guild:getChannel(segment.pivot.channel)
+      if not channel then
+        msg:reply("Something went horribly wrong, but it's not your fault. This incident has been (hopefully) reported")
+        return nil
+      end
+      local message = channel:getMessage(segment.pivot.message)
+      if not message then
+        msg:reply("Something went horribly wrong, but it's not your fault. This incident has been (hopefully) reported")
+        return nil
+      end
+      local grabEmoji = function(reaction)
+        segment.pivot.buttons[tostring(reaction.emojiHash)] = {
+          type = "toggler",
+          on = args[1],
+          off = args[2],
+        }
+        msg:reply("Toggler added successfully")
+      end
+      message:removeReaction(emoji,client.user.id)
+      client:once("reactionAdd",grabEmoji)
+      if not message:addReaction(emoji) then
+        client:removeListener("reactionAdd",grabEmoji)
+        msg:reply("Couldn't add reaction - emoji might be invalid")
+      end
+    end
+  },
+  ["button"] = {
+    help = {
+      title = "Add a button that runs specific command when pressed",
+      description = "Note: you cannot assign more than one action to a single reaction \n``$user`` gets replaced with the id of the user that interacted with the reaction.",
+      fields = {
+        {name = "Usage: ",value = "button <emoji> <command>"},
+        {name = "Perms: ",value = "administrator"}
+      }
+    },
+    args = {
+      "string",
+      "string",
+    },
+    perms = {
+      perms = {
+        "administrator"
+      }
+    },
+    exec = function(msg,args,opts)
+      if not segment.pivot then
+        msg:reply("Pivot not selected. Use "..globals.prefix.."pivot to select it and then try again")
+        return nil
+      end
+      local emoji = getEmoji(args[1])
+      local channel = guild:getChannel(segment.pivot.channel)
+      if not channel then
+        msg:reply("Something went horribly wrong, but it's not your fault. This incident has been (hopefully) reported")
+        return nil
+      end
+      local message = channel:getMessage(segment.pivot.message)
+      if not message then
+        msg:reply("Something went horribly wrong, but it's not your fault. This incident has been (hopefully) reported")
+        return nil
+      end
+      local grabEmoji = function(reaction)
+        segment.pivot.buttons[tostring(reaction.emojiHash)] = {
+          type = "toggler",
+          on = args[1],
+        }
+        msg:reply("Button added successfully")
+      end
+      message:removeReaction(emoji,client.user.id)
+      client:once("reactionAdd",grabEmoji)
+      if not message:addReaction(emoji) then
+        client:removeListener("reactionAdd",grabEmoji)
+        msg:reply("Couldn't add reaction - emoji might be invalid")
+      end
+    end
+  },
 }
 
-events:on("reactionAdd",function(reaction,userID)
-  local messageId = tostring(reaction.message.id)
-  local hash = tostring(reaction.emojiId or reaction.emojiName)
-  if segment.pivots[messageId] and userID ~= client.user.id  then
-    local current_pivot = segment.pivots[messageId]
+
+local buttonOn = function(message,hash,userID)
+  if segment.pivots[message.id] and userID ~= client.user.id  then
+    local current_pivot = segment.pivots[message.id]
     if current_pivot.buttons[hash] then
-      local current_button = current_pivot.buttons[reaction.emojiHash]
+      local current_button = current_pivot.buttons[hash]
       if current_button.type == "role-toggler" then
         guild:getMember(userID):addRole(current_button.role)
       end
+      if current_button.type == "toggler" then
+        emulate.send(message,{
+          delete = function() end,
+          content = current_button.on
+        })
+      end
+      if current_button.type == "button" then
+        emulate.send(message,{
+          delete = function() end,
+          content = current_button.on
+        })
+        message:removeReaction(hash,id)
+      end
     end
   end
-end)
+end
 
-events:on("reactionRemove",function(reaction,userID)
-  local messageId = tostring(reaction.message.id)
-  local hash = tostring(reaction.emojiId or reaction.emojiName)
-  if segment.pivots[messageId] and userID ~= client.user.id  then
-    local current_pivot = segment.pivots[messageId]
+local buttonOff = function(message,hash,userID)
+  if segment.pivots[message.id] and userID ~= client.user.id  then
+    local current_pivot = segment.pivots[message.id]
     if current_pivot.buttons[hash] then
-      local current_button = current_pivot.buttons[reaction.emojiHash]
+      local current_button = current_pivot.buttons[hash]
       if current_button.type == "role-toggler" then
         guild:getMember(userID):removeRole(current_button.role)
       end
+      if current_button.type == "toggler" then
+        emulate.send(message,{
+          delete = function() end,
+          content = current_button.off
+        })
+      end
     end
   end
+end
+
+events:on("reactionAdd",function(reaction,userID)
+  local message = reaction.message
+  local hash = tostring(reaction.emojiId or reaction.emojiName)
+  buttonOn(message,hash,userID)
+end)
+
+events:on("reactionRemove",function(reaction,userID)
+  local message = reaction.message
+  local hash = tostring(reaction.emojiId or reaction.emojiName)
+  buttonOff(message,hash,userID)
 end)
 
 events:on("reactionAddUncached",function(channelId,messageId,hash,userId)
-  local messageId = tostring(messageId)
+  local message = client:getChannel(channelId):getMessage(messageId)
   local hash = tostring(hash)
-  if segment.pivots[messageId] and userId ~= client.user.id then
-    local current_pivot = segment.pivots[messageId]
-    if current_pivot.buttons[hash] then
-      local current_button = current_pivot.buttons[hash]
-      if current_button.type == "role-toggler" then
-        guild:getMember(userId):addRole(current_button.role)
-      end
-    end
-  end
+  buttonOn(message,hash,userId)
 end)
 
 events:on("reactionRemoveUncached",function(channelId,messageId,hash,userId)
-  local messageId = tostring(messageId)
+  local message = client:getChannel(channelId):getMessage(messageId)
   local hash = tostring(hash)
-  if segment.pivots[messageId] and userId ~= client.user.id  then
-    local current_pivot = segment.pivots[messageId]
-    if current_pivot.buttons[hash] then
-      local current_button = current_pivot.buttons[hash]
-      if current_button.type == "role-toggler" then
-        guild:getMember(userId):removeRole(current_button.role)
-      end
-    end
-  end
+  buttonOff(message,hash,userId)
 end)
 
 events:on("serverSaveConfig",function()
