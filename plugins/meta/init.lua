@@ -121,7 +121,12 @@ segment.commands = {
     }},
     exec = function(msg,args,opts)
       local before = msg:getDate()
-      local after = msg:reply("Pong!"):getDate()
+      local reply = msg:reply("Pong!")
+      if not reply then
+        log("ERROR","Couldn't send the ping reply for some reason")
+        return
+      end
+      local after = reply:getDate()
       local latency = (after:toMilliseconds() - before:toMilliseconds())
       last_message_arrived:stop()
       local uptime = discordia.Date():toSeconds() - discordia.uptime:toSeconds()

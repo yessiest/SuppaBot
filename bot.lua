@@ -99,6 +99,7 @@ function Server:load_plugin(name)
     },
     discordia = discordia,
     require = require,
+    log = self.log
   },{__index = _G})
   --validate package code
   local valid,err = validate.check_file_validation(name,per_package_environment,function(segment)
