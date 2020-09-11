@@ -197,7 +197,7 @@ function Server:start()
   client:on("messageCreate",function(msg)
     if msg.guild.id == self.id then
       server_save_counter = server_save_counter + 1
-      if server_save_counter > 25 then
+      if server_save_counter > 10*((math.floor(msg.guild.totalMemberCount/25))+1) then
         self.log("INFO","Saving server configs")
         self.save_data(self)
         server_save_counter = 0
