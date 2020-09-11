@@ -319,10 +319,14 @@ events:on("clock",function()
       for k,v in pairs(segment.tab) do
         if (v.type == "time") and check_time(utc_time,v.time) then
           emulate_message = getLastMessageOf(v.channel,v.member)
-          emulate.send(emulate_message,{
-            content = v.task,
-            delete = function() end
-          })
+          if not emulate_message then
+            emulate.send(emulate_message,{
+              content = v.task,
+              delete = function() end
+            })
+          else
+            log("ERROR","There are no messages to dupe a new one from")
+          end
           if v.once then
             table.remove(segment.tab,k)
           end
