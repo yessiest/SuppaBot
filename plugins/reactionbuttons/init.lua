@@ -86,7 +86,7 @@ segment.commands = {
         return nil
       end
       local grabEmoji = function(reaction)
-        segment.pivot.buttons[tostring(reaction.emojiHash)] = {
+        segment.pivot.buttons[tostring(reaction.emojiId or reaction.emojiName)] = {
           type = "role-toggler",
           role = tostring(args[2].id)
         }
@@ -128,8 +128,8 @@ segment.commands = {
       if args[1] then
         local emoji = getEmoji(args[1])
         message:removeReaction(emoji,client.user.id)
-        segment.pivot.buttons[tostring(emoji.hash)] = nil
-        msg:reply("Action for "..emoji.name.." successfully removed")
+        segment.pivot.buttons[((type(emoji) == "table") and emoji.id) or emoji] = nil
+        msg:reply("Action successfully removed")
       else
         message:clearReactions()
         segment.pivots[tostring(message.id)] = nil
@@ -174,10 +174,10 @@ segment.commands = {
         return nil
       end
       local grabEmoji = function(reaction)
-        segment.pivot.buttons[tostring(reaction.emojiHash)] = {
+        segment.pivot.buttons[tostring(reaction.emojiId or reaction.emojiName)] = {
           type = "toggler",
-          on = args[1],
-          off = args[2],
+          on = args[2],
+          off = args[3],
         }
         msg:reply("Toggler added successfully")
       end
@@ -224,9 +224,9 @@ segment.commands = {
         return nil
       end
       local grabEmoji = function(reaction)
-        segment.pivot.buttons[tostring(reaction.emojiHash)] = {
-          type = "toggler",
-          on = args[1],
+        segment.pivot.buttons[tostring(reaction.emojiId or reaction.emojiName)] = {
+          type = "button",
+          on = args[2],
         }
         msg:reply("Button added successfully")
       end
@@ -242,42 +242,51 @@ segment.commands = {
 
 
 local buttonOn = function(message,hash,userID)
-  if segment.pivots[message.id] and userID ~= client.user.id  then
-    local current_pivot = segment.pivots[message.id]
-    if current_pivot.buttons[hash] then
-      local current_button = current_pivot.buttons[hash]
+  if segment.pivots[tostring(message.id)] and userID ~= client.user.id  then
+    local current_pivot = segment.pivots[tostring(message.id)]
+    p(hash)
+    p(current_pivot.buttons)
+    if current_pivot.buttons[tostring(hash)] then
+      local current_button = current_pivot.buttons[tostring(hash)]
+      local new_content
+      if current_button.on then
+        new_content = current_button.on:gsub("%$user",userID)
+      end
       if current_button.type == "role-toggler" then
         guild:getMember(userID):addRole(current_button.role)
       end
       if current_button.type == "toggler" then
         emulate.send(message,{
           delete = function() end,
-          content = current_button.on
+          content = new_content
         })
       end
       if current_button.type == "button" then
         emulate.send(message,{
           delete = function() end,
-          content = current_button.on
+          content = new_content
         })
-        message:removeReaction(hash,id)
       end
     end
   end
 end
 
 local buttonOff = function(message,hash,userID)
-  if segment.pivots[message.id] and userID ~= client.user.id  then
-    local current_pivot = segment.pivots[message.id]
-    if current_pivot.buttons[hash] then
-      local current_button = current_pivot.buttons[hash]
+  if segment.pivots[tostring(message.id)] and userID ~= client.user.id  then
+    local current_pivot = segment.pivots[tostring(message.id)]
+    if current_pivot.buttons[tostring(hash)] then
+      local current_button = current_pivot.buttons[tostring(hash)]
+      local new_content
+      if current_button.off then
+        new_content = current_button.off:gsub("%$user",userID)
+      end
       if current_button.type == "role-toggler" then
         guild:getMember(userID):removeRole(current_button.role)
       end
       if current_button.type == "toggler" then
         emulate.send(message,{
           delete = function() end,
-          content = current_button.off
+          content = new_content
         })
       end
     end
