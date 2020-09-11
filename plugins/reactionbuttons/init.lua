@@ -244,8 +244,6 @@ segment.commands = {
 local buttonOn = function(message,hash,userID)
   if segment.pivots[tostring(message.id)] and userID ~= client.user.id  then
     local current_pivot = segment.pivots[tostring(message.id)]
-    p(hash)
-    p(current_pivot.buttons)
     if current_pivot.buttons[tostring(hash)] then
       local current_button = current_pivot.buttons[tostring(hash)]
       local new_content
