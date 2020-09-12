@@ -61,10 +61,16 @@ for k,v in pairs(plugin_list) do
       for k2,v2 in pairs(new_plugin()) do
         internalCommands[k2] = v2
       end
+      log("DEBUG","Loaded metashell submodule "..v)
+    else
+      log("ERROR","Failed to load metashell submodule "..v..": "..thing)
     end
+  else
+    log("ERROR","Failed to load metashell submodule "..v..": "..err)
   end
 end
 --this function will reload the environment when commands are added
+p(internalCommands)
 local function loadEnvironment()
   if env then
     env.destroy()
