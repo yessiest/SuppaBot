@@ -70,7 +70,6 @@ for k,v in pairs(plugin_list) do
   end
 end
 --this function will reload the environment when commands are added
-p(internalCommands)
 local function loadEnvironment()
   if env then
     env.destroy()
