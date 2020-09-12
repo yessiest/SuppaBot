@@ -20,6 +20,8 @@ return function(server,command,message,discordia)
 
   if message.guild and message.guild.id == server.id then
     sandboxing_pass = true
+  else
+    return false
   end
   if (not command.perms) or command.perms.any then
     permission_pass = true
