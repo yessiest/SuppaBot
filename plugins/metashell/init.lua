@@ -139,7 +139,6 @@ segment.commands = {
     exec = function(msg,args,opts)
       if scripts[args[1]] then
         scripts[args[1]] = nil
-        scripts_raw[args[1]] = nil
         msg:reply("Script "..args[1].." deleted")
       else
         msg:reply("Script not found")
