@@ -34,9 +34,10 @@ events:on("serverSaveConfig",function()
   file.writeJSON("./servers/"..id.."/warns.json",segment.warns)
 end)
 
-local warn = function(ID,reason,guild)
+local warn = function(ID,reason)
+  local guild = client:getGuild(id)
   if not segment.warns[tostring(ID)] then segment.warns[tostring(ID)] = {} end
-  segment.warns[tostring(ID)][#segment.warns[tostring(ID)]+1] = reason
+  table.insert(segment.warns[tostring(ID)],1,reason)
   if segment.settings.warn_limit and (#segment.warns[tostring(ID)] >= segment.settings.warn_limit) and guild:getMember(tostring(ID)) then
     if segment.settings.warn_punishment == "kick" then
       guild:getMember(tostring(ID)):kick("Warning quota exceeded.")
@@ -261,7 +262,101 @@ segment.commands = {
       end)
       msg.channel:bulkDelete(messages)
     end
-  }
+  },
+  ["warn"] = {
+    help = {embed={
+      title = "Warn a user",
+      descriptions = "Warnings by themselves don't do any punishment to the user, but they allow managing users",
+      fields = {
+        {name = "Usage: ",value = "warn <user> <reason>"},
+        {name = "Perms: ",value = "kickMembers"}
+      }
+    }},
+    perms = {
+      perms = {
+        "kickMembers"
+      }
+    },
+    args = {
+      "member",
+      "string"
+    },
+    exec = function(msg,args,opts)
+      local reason = table.concat(args," ",2)
+      warn(args[1].id,reason)
+      msg:reply({embed = {
+        title = "User "..args[1].name.." warned",
+        description = "Reason: ```"..reason.."```"
+      }})
+    end
+  },
+  ["warns"] = {
+    help = {embed={
+      title = "List warnings",
+      descriptions = "self-descriptive",
+      fields = {
+        {name = "Usage: ",value = "warns <member> [<page>]"},
+        {name = "Perms: ",value = "kickMembers"}
+      }
+    }},
+    perms = {
+      perms = {
+        "kickMembers"
+      }
+    },
+    args = {
+      "member",
+    },
+    exec = function(msg,args,opts)
+      local page = (tonumber(args[2]) or 1)-1
+      local new_embed = {
+        title = "Warnings for "..args[1].name,
+        fields = {}
+      }
+      if page < 0 then
+        new_embed.description = "Page "..page.." not found, reverting to first page"
+        page = 0
+      end
+      if segment.warns[tostring(args[1].id)] and #segment.warns[tostring(args[1].id)] > 0 then
+        for I = 1+(page*5),5+(page*5) do
+          local warn = segment.warns[tostring(args[1].id)][I]
+          if warn then
+            table.insert(new_embed.fields,{name = "ID: "..tostring(I),value = warn})
+          end
+        end
+        msg:reply({embed = new_embed})
+      else
+        msg:reply("This user has no warnings")
+      end
+    end
+  },
+  ["unwarn"] = {
+    help = {embed={
+      title = "Revoke a warning issued to a user",
+      descriptions = "self-descriptive",
+      fields = {
+        {name = "Usage: ",value = "unwarn <user> [<warn id>]"},
+        {name = "Perms: ",value = "kickMembers"}
+      }
+    }},
+    perms = {
+      perms = {
+        "kickMembers"
+      }
+    },
+    args = {
+      "member",
+    },
+    exec = function(msg,args,opts)
+      local warn_id = (tonumber(args[2]) or 1)
+      if segment.warns[tostring(args[1].id)][warn_id] then
+        table.remove(segment.warns[tostring(args[1].id)],warn_id)
+        msg:reply("Revoked warning #"..warn_id)
+      else
+        msg:reply("No warning with id "..warn_id)
+      end
+    end
+  },
 }
 
 events:on("memberUpdate",function(member)
