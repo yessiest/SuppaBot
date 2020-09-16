@@ -35,7 +35,7 @@ end
 
 local function getLastMessageOf(channel,member)
   for k,v in pairs(client:getGuild(id):getChannel(channel).messages) do
-    if v.member.id == member then
+    if v.member and v.member.id == member then
       return v
     end
   end
