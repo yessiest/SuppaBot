@@ -54,8 +54,8 @@ file.existsDir = function(filename)
   end
 end
 
-if pcall(require,"json") then
-  local json = require("json")
+file.activate_json = function(jsonlib)
+  local json = jsonlib
   file.readJSON = function(filename,default)
     assert(type(filename) == "string","string expected, got "..type(filename))
     local json_data,err = file.read(filename,"*a")

@@ -3,6 +3,7 @@ package.path = "./libraries/?.lua;./libraries/?/init.lua;"..package.path
 discordia = require("discordia")
 core = require("core")
 file = require("file")
+file.activate_json(require("json"))
 color = require("tty-colors")
 validate = require("check-lua")
 fake_message = require("fake_message")

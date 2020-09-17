@@ -2,6 +2,7 @@
 local segment = {}
 segment.help = "Add tasks to be executed later"
 local file = require("file")
+file.activate_json(require("json"))
 local utils = require("bot_utils")
 local emulate = require("emulate")({
   client = client,

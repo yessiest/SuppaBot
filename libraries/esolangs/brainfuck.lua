@@ -32,7 +32,6 @@ local match_bracket = function(position,text,mode,match_left,match_right)
   end
   return matching
 end
-local sleep = require("microutils").sleep
 local file = require("file")
 local bf = {}
 --create interpreter object. created for each code chunk as tape reinitialization is required to run new code.

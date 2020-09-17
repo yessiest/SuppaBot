@@ -2,6 +2,7 @@
 local air = require("air")
 local json = require("json")
 local file = require("file")
+file.activate_json(json)
 local segment = {}
 segment.setnames = {}
 segment.name = "enforcer"

@@ -5,10 +5,12 @@ local emulate = require("emulate")({
   discordia = discordia
 })
 local json = require("json")
+local file = require("file")
+file.activate_json(json)
 segment.help = "Metashell is a plugin designed to let you handle commands in batches, like a shell would"
 --these will store things to be carried over sessions and objects that we'll output
-local variables = require("file").readJSON("./servers/"..id.."/variables.json",{})
-local scripts = require("file").readJSON("./servers/"..id.."/scripts.json",{})
+local variables = file.readJSON("./servers/"..id.."/variables.json",{})
+local scripts = file.readJSON("./servers/"..id.."/scripts.json",{})
 local delay = discordia.Stopwatch()
 --these will be used to store our new command environment and our shell
 local env
@@ -194,8 +196,8 @@ events:on("messageCreate",function(msg)
 end)
 
 events:on("serverSaveConfig",function()
-  require("file").writeJSON("./servers/"..id.."/variables.json",variables)
-  require("file").writeJSON("./servers/"..id.."/scripts.json",scripts)
+  file.writeJSON("./servers/"..id.."/variables.json",variables)
+  file.writeJSON("./servers/"..id.."/scripts.json",scripts)
 end)
 
 segment.unload = function()

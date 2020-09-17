@@ -3,8 +3,10 @@ local emulate = require("emulate")({
   client = client,
   discordia = discordia,
 })
+local file = require("file")
+file.activate_json(require("json"))
 local guild = client:getGuild(id)
-segment.pivots = require("file").readJSON("./servers/"..id.."/reactions.json",{})
+segment.pivots = file.readJSON("./servers/"..id.."/reactions.json",{})
 local getEmoji = function(id)
   local emoji = guild:getEmoji(id:match("(%d+)[^%d]*$"))
   if emoji then
@@ -316,7 +318,7 @@ events:on("reactionRemoveUncached",function(channelId,messageId,hash,userId)
 end)
 
 events:on("serverSaveConfig",function()
-  require("file").readJSON("./servers/"..id.."/reactions.json",segment.pivots)
+  file.readJSON("./servers/"..id.."/reactions.json",segment.pivots)
 end)
 
 return segment
