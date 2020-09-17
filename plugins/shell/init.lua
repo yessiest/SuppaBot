@@ -39,7 +39,7 @@ function create_shell(msg)
 end
 
 --this will load additional commands from the shell-addons directory
-segment.plugins_path = "./plugins/metashell/shell-addons/"
+segment.plugins_path = "./plugins/shell/shell-addons/"
 local internalCommands = {}
 local plugin_list = {}
 local ls = io.popen("ls -1 "..segment.plugins_path,"r")
