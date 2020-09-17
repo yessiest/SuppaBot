@@ -43,10 +43,10 @@ return function(args)
       envs[id] = true
       --this will emulate bot behavior for commands in the new environment
       local checking_callback = function(message,envId)
-        if require("check_partitioning").msg(message,server.id,args.client.user.id) and (envId == id) then
+        if (envId == id) then
           for k,v in pairs(commands) do
             if (message.content.." "):find(server.config.prefix..k.." ",1,true) == 1 and require("check_perms")(server,v,message,args.discordia) then
-              local status,args,opts,err = require("air").parse(message.content:gsub(server.config.prefix..k,"",1),v.args,args.client,server.id)
+              local status,args,opts,err = require("air").parse(message.content:sub((server.config.prefix..k):len()+1,-1),v.args,args.client,server.id)
               if status then
                 v.exec(message,args,opts)
               else
