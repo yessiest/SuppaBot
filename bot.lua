@@ -187,7 +187,11 @@ function Server:start()
           local status,args,opts,err = require("air").parse(msg.content:sub((self.config.prefix..k):len()+1,-1),v.args,client,self.id)
           if status then
             self.log("INFO","Executing command "..k)
-            self.log("DEBUG","Args: "..table.concat(args,";"))
+            print_args = ""
+            for k,v in pairs(args) do
+              print_args = print_args..tostring(v).."; "
+            end
+            self.log("DEBUG","Args: "..print_args)
             print_opts = ""
             for k,v in pairs(opts) do
               print_opts = print_opts..tostring(k)..": "..tostring(v).."\n"
