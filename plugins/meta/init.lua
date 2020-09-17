@@ -140,7 +140,34 @@ segment.commands = {
         }
       }})
     end
-  }
+  },
+  ["about"] = {
+    help = {embed = {
+      title = "View bot info",
+      description = "self-descriptive",
+      fields = {
+        {name = "Usage: ",value = "about"},
+        {name = "Perms: ",value = "all"}
+      }
+    }},
+    exec = function(msg,args,opts)
+      local rand = math.random
+      local author = client:getUser("245973168257368076")
+      msg:reply({embed = {
+        title = "About Suppa-Bot",
+        thumbnail = {
+          url = client.user:getAvatarURL()
+        },
+        color = discordia.Color.fromRGB(rand(50,200),rand(50,200),rand(50,200)).value,
+        description = "Suppa-Bot is an open-source bot written in Lua.",
+        fields = {
+          {name = "Source Code: ",value = "https://github.com/yessiest/SuppaBot"},
+          {name = "Author: ",value = author.username.."#"..author.tag},
+          {name = "Invite: ",value = "Not available yet"}
+        }
+      }})
+    end
+  },
 }
 events:on("messageCreate",function(msg)
   for k,v in pairs(map) do
