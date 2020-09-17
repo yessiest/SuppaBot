@@ -16,9 +16,9 @@ end
 _G.logging.enable = true
 return function(file,prefix)
   local logger = {}
-  if not filelib.exists(file) then
+  if filelib.exists(file) then
     logger.file_handler = io.open(file,"a")
-  else 
+  else
     logger.file_handler = io.open(file,"w")
   end
   function logger:log(type,data)
