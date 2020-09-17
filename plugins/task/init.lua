@@ -37,6 +37,8 @@ local function getLastMessageOf(channel,member)
   for k,v in pairs(client:getGuild(id):getChannel(channel).messages) do
     if v.member and v.member.id == member then
       return v
+    else
+      log("DEBUG","Picked an uncached message as a dupe candidate "..tostring(v.id))
     end
   end
 end
@@ -319,7 +321,7 @@ events:on("clock",function()
       for k,v in pairs(segment.tab) do
         if (v.type == "time") and check_time(utc_time,v.time) then
           emulate_message = getLastMessageOf(v.channel,v.member)
-          if not emulate_message then
+          if emulate_message then
             emulate.send(emulate_message,{
               content = v.task,
               delete = function() end
