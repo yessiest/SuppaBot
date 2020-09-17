@@ -162,7 +162,7 @@ segment.commands = {
         description = "Suppa-Bot is an open-source bot written in Lua.",
         fields = {
           {name = "Source Code: ",value = "https://github.com/yessiest/SuppaBot"},
-          {name = "Author: ",value = author.username.."#"..author.tag},
+          {name = "Author: ",value = author.tag},
           {name = "Invite: ",value = "Not available yet"}
         }
       }})
