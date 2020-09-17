@@ -185,6 +185,13 @@ function Server:start()
           --break down the message into arguments and options, match arguments if provided
           local status,args,opts,err = require("air").parse(msg.content:sub((self.config.prefix..k):len()+1,-1),v.args,client,self.id)
           if status then
+            self.log("INFO","Executing command "..k)
+            self.log("DEBUG","Args: "..table.concat(args,";"))
+            print_opts = ""
+            for k,v in pairs(opts) do
+              print_opts = print_opts..tostring(k)..": "..tostring(v).."\n"
+            end
+            self.log("DEBUG","Options: "..print_opts)
             v.exec(msg,args,opts)
           else
             msg:reply(err)
@@ -204,6 +211,21 @@ function Server:start()
       end
     end
   end)
+  self.log("INFO","Finished loading server id "..self.id)
+end
+
+function Server:shutdown()
+  self.log("INFO","Removing server object for guild id "..self.id)
+  for k,v in pairs(self.plugins) do
+    self:unload_plugin(k)
+  end
+  self.log:close()
+  if self.signals.handlers then
+    for k,v in pairs(self.signals.handlers) do
+      self.signals:removeAllListeners(k)
+    end
+  end
+  self = nil
 end
 
 client:on("ready",function()
@@ -229,7 +251,7 @@ end)
 
 client:on("shutdown",function()
   for k,v in pairs(servers) do
-    v.log:close()
+    v:shutdown()
   end
   os.exit()
 end)
@@ -245,14 +267,7 @@ client:on("guildDelete",function(guild)
   if not servers[guild.id] then
     return
   end
-  servers[guild.id].log("INFO","Removing server object")
-  for k,v in pairs(servers[guild.id].plugins) do
-    servers[guild.id]:unload_plugin(k)
-  end
-  servers[guild.id].log:close()
-  for k,v in pairs(servers[guild.id].signals.handlers) do
-    servers[guild.id].signals:removeAllListeners(k)
-  end
+  servers[guild.id]:shutdown()
 end)
 
 local tempfile = io.open("./token","r")
