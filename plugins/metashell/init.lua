@@ -4,7 +4,7 @@ local emulate = require("emulate")({
   client = client,
   discordia = discordia
 })
-local json = require("dkjson")
+local json = require("json")
 segment.help = "Metashell is a plugin designed to let you handle commands in batches, like a shell would"
 --these will store things to be carried over sessions and objects that we'll output
 local variables = require("file").readJSON("./servers/"..id.."/variables.json",{})

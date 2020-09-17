@@ -1,6 +1,6 @@
 --TODO: Add domain-specific manuals, Document
 local air = require("air")
-local json = require("dkjson")
+local json = require("json")
 local file = require("file")
 local segment = {}
 segment.setnames = {}
