@@ -37,16 +37,29 @@ end)
 
 local warn = function(ID,reason)
   local guild = client:getGuild(id)
+  local member = gulid:getMember(tostring(ID))
   if not segment.warns[tostring(ID)] then segment.warns[tostring(ID)] = {} end
   table.insert(segment.warns[tostring(ID)],1,reason)
   if segment.settings.warn_limit and (#segment.warns[tostring(ID)] >= segment.settings.warn_limit) and guild:getMember(tostring(ID)) then
     if segment.settings.warn_punishment == "kick" then
-      guild:getMember(tostring(ID)):kick("Warning quota exceeded.")
+      member:kick("Warning quota exceeded.")
     elseif segment.settings.warn_punishment == "ban" then
-      guild:getMember(tostring(ID)):ban("Warning quota exceeded.",segment.settings.ban_days)
+      member:ban("Warning quota exceeded.",segment.settings.ban_days)
     end
   end
   _ = (client:getUser(tostring(ID)) and client:getUser(tostring(ID)):send("You have been warned for: "..reason))
+  signals:emit("warn",function(args)
+    if args[1] and member.name:find(args[1],1,true) then
+      return true
+    elseif not args[1] then
+      return true
+    else
+      return false
+    end
+  end,{
+    user = member.id,
+    username = member.name
+  })
 end
 
 segment.commands = {
@@ -212,7 +225,21 @@ segment.commands = {
       "member"
     },
     exec = function(msg,args,opts)
-      args[1]:kick(args[2])
+      local member = args[1]
+      signals:emit("kick",function(args)
+        if args[1] and member.name:find(args[1],1,true) then
+          return true
+        elseif not args[1] then
+          return true
+        else
+          return false
+        end
+      end,{
+        user = member.id,
+        username = member.name,
+        reason = args[2]
+      })
+      member:kick(args[2])
     end
   },
   ["ban"] = {
@@ -233,7 +260,22 @@ segment.commands = {
       "member"
     },
     exec = function(msg,args,opts)
-      args[1]:ban(args[2],tonumber(args[3]))
+      local member = args[1]
+      signals:emit("kick",function(args)
+        if args[1] and member.name:find(args[1],1,true) then
+          return true
+        elseif not args[1] then
+          return true
+        else
+          return false
+        end
+      end,{
+        user = member.id,
+        username = member.name,
+        reason = args[2],
+        days = args[3]
+      })
+      member:ban(args[2],tonumber(args[3]))
     end
   },
   ["purge"] = {

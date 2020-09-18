@@ -293,23 +293,28 @@ local function check_time(date,crondate)
 end
 
 events:on("messageCreate",function(msg)
-  if msg.content:match("test") then
-    signals:emit("test")
-  end
-  if msg.content:match("memst") then
-    signals:emit("memst",function(args)
-      local output = false
-      if (not args[1]) or args[1]:match("wario") then
-        output = true
-      end
-      if output and ((not args[2]) or args[2]:match("every copy of mario 64 is personalized")) then
-        output = true
-      else
-        output = false
-      end
-      return output
-    end)
-  end
+  signals:emit("message",function(args)
+    local output = true
+    if not args[1] then
+      output = true
+    elseif msg.content:find(args[1],1,true) then
+      output = true
+    else
+      output = false
+    end
+    if output and (not args[2]) then
+      output = true
+    elseif output and (msg.user.name:find(args[2],1,true)) then
+      output = true
+    else
+      output = false
+    end
+    return output
+  end,{
+    user = msg.user.id,
+    content = msg.content,
+    username = msg.user.name
+  })
 end)
 
 events:on("serverSaveConfig",function()
