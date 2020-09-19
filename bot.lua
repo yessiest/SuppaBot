@@ -100,7 +100,7 @@ function Server:load_plugin(name)
     },
     discordia = discordia,
     require = require,
-    log = self.log
+    log = function() end
   },{__index = _G})
   --validate package code
   local valid,err = validate.check_file_validation(name,per_package_environment,function(segment)
@@ -118,6 +118,7 @@ function Server:load_plugin(name)
   end
   local chunk,err = file.read(name,"*a")
   --register commands
+  per_package_environment.log = self.log
   self.plugins[name].origin = load(chunk,"Plugin: "..name,"t",per_package_environment)()
   for k,v in pairs(self.plugins[name].origin.commands) do
     if not self.commands[k] then
