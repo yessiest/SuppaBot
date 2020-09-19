@@ -39,7 +39,14 @@ local function getLastMessageOf(channel,member)
     if v.member and v.member.id == member then
       return v
     else
-      log("DEBUG","Picked an uncached message as a dupe candidate "..tostring(v.id))
+      if not v.member then
+        log("DEBUG","Picked an uncached message as a dupe candidate "..tostring(v.id))
+        log("DEBUG",[[Here are some of its properties
+id = ]]..tostring(v.id)..[[
+member = ]]..tostring(v.member)..[[
+content = ]]..tostring(v.content)..[[
+        ]])
+      end
     end
   end
 end
@@ -302,6 +309,12 @@ events:on("messageCreate",function(msg)
     else
       output = false
     end
+    if output and (tostring(msg.author.id) == tostring(client.user.id)) then
+      output = false
+    end
+    if output and (msg.emulated) then
+      output = false
+    end
     if output and (not args[2]) then
       output = true
     elseif output and (msg.user.name:find(args[2],1,true)) then
@@ -311,10 +324,12 @@ events:on("messageCreate",function(msg)
     end
     return output
   end,{
-    user = msg.user.id,
+    user = msg.author.id,
     content = msg.content,
-    username = msg.user.name
+    name = msg.author.name,
+    ctxid = msg.id
   })
+  return
 end)
 
 events:on("serverSaveConfig",function()

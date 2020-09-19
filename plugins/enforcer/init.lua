@@ -37,7 +37,7 @@ end)
 
 local warn = function(ID,reason)
   local guild = client:getGuild(id)
-  local member = gulid:getMember(tostring(ID))
+  local member = guild:getMember(tostring(ID))
   if not segment.warns[tostring(ID)] then segment.warns[tostring(ID)] = {} end
   table.insert(segment.warns[tostring(ID)],1,reason)
   if segment.settings.warn_limit and (#segment.warns[tostring(ID)] >= segment.settings.warn_limit) and guild:getMember(tostring(ID)) then
@@ -58,7 +58,7 @@ local warn = function(ID,reason)
     end
   end,{
     user = member.id,
-    username = member.name
+    name = member.name
   })
 end
 
@@ -236,7 +236,7 @@ segment.commands = {
         end
       end,{
         user = member.id,
-        username = member.name,
+        name = member.name,
         reason = args[2]
       })
       member:kick(args[2])
@@ -271,7 +271,7 @@ segment.commands = {
         end
       end,{
         user = member.id,
-        username = member.name,
+        name = member.name,
         reason = args[2],
         days = args[3]
       })
