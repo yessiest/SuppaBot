@@ -317,7 +317,7 @@ events:on("messageCreate",function(msg)
     end
     if output and (not args[2]) then
       output = true
-    elseif output and (msg.user.name:find(args[2],1,true)) then
+    elseif output and (msg.author.name:find(args[2],1,true)) then
       output = true
     else
       output = false
