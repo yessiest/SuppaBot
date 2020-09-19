@@ -23,6 +23,13 @@ Would be neat though.
 I'm not saying you can't, I'm saying you shouldn't.
 Sincerely, the human error that created this bot.
 
+## Versioning conventions
+
+```
+Major.Minor.patch
+```
+
 ## License
 
 This bot's source code, and subsequent parts of it are all licensed under the [MIT license](https://mit-license.org)
+
