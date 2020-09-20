@@ -1,4 +1,4 @@
-local json = require("dkjson")
+local json = require("json")
 return {
   ["help"] = {
     help = "oh hai mark",
