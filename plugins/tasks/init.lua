@@ -122,7 +122,7 @@ segment.commands = {
 ``task "5 10 * *" "]]..globals.prefix..[[speak hi"`` -- sends "hi" to the current channel at 10:05 every day every month
 ``task "5 10 15 *" "]]..globals.prefix..[[speak hi"`` -- sends "hi" to the current channel at 10:05 every 15th day of the month
 ``task --once  "5 10 15 *" "]]..globals.prefix..[[speak hi"`` -- same as before, except the task gets removed after sending the message
-additional examples can be found at <link here> (ALLAN PLEASE ADD DETAILS)
+additional examples can be found at https://github.com/yessiest/SuppaBot/wiki/Tasks
         ]]}
       }
     }},

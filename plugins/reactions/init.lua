@@ -23,7 +23,7 @@ segment.commands = {
       description = "Pivot is like a message selector which allows easy reaction manipulations",
       fields = {
         {name = "Usage: ",value = "pivot <message link>"},
-        {name = "Perms: ",valeu = "Administarto"}
+        {name = "Perms: ",valeu = "Administartor"}
       }
     },
     args = {

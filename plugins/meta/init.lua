@@ -44,7 +44,8 @@ segment.commands = {
         {name = "Examples: ",value = [[
 ``alias !hi "]]..globals.prefix..[[speak Hello!"`` - reply to !hi with "Hello!" using speak command
 ``alias !say "]]..globals.prefix..[[speak ..."`` - reply to !hi with everything typed after !hi
-``alias !say "]]..globals.prefix..[[speak $1"`` - reply to !hi with the first argument sent along with !hi]]
+``alias !say "]]..globals.prefix..[[speak $1"`` - reply to !hi with the first argument sent along with !hi
+More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
         },
         {name = "Perms: ",value = "Administrator (doesn't apply to created aliases)"}
       }

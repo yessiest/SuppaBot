@@ -91,7 +91,7 @@ segment.commands = {
   ["script"] = {
     help = {embed={
       title = "Add sh-like scripts",
-      description = "For more information, see <link here> (ALLAN PLEASE ADD DETAILS)",
+      description = "For more information, see https://github.com/yessiest/SuppaBot/wiki/Scripts",
       fields = {
         {name = "Usage: ",value = "script ```<script>```"},
         {name = "Perms: ",value = "Administrator"}
@@ -105,7 +105,7 @@ segment.commands = {
         "Administrator"
       }
     },
-    exec = function(msg,args,opts)
+    exec = function(msg,args,opts)<link here> (ALLAN PLEASE ADD DETAILS)
       create_shell(msg)
       local script = msg.content:match("```(.+)```")
       local meta = shell.parse_meta_properties(script)
@@ -124,7 +124,7 @@ segment.commands = {
   ["script-remove"] = {
     help = {embed={
       title = "Remove a script",
-      description = "For more information, see <link here> (ALLAN PLEASE ADD DETAILS)",
+      description = "For more information, see https://github.com/yessiest/SuppaBot/wiki/Scripts",
       fields = {
         {name = "Usage: ",value = "script-delete <name>"},
         {name = "Perms: ",value = "Administrator"}
@@ -150,7 +150,7 @@ segment.commands = {
   ["scripts"] = {
     help = {embed={
       title = "List all scripts",
-      description = "For more information, see <link here> (ALLAN PLEASE ADD DETAILS)",
+      description = "For more information, see https://github.com/yessiest/SuppaBot/wiki/Scripts",
       fields = {
         {name = "Usage: ",value = "scripts"},
         {name = "Perms: ",value = "Administrator"}
