@@ -71,6 +71,7 @@ segment.commands = {
       local code = msg.content:match("```(.+)```")
       if not code then
         msg:reply("Invalid syntax")
+        return
       end
       local input = msg.content:match("```.+``` ?(.+)") or ""
       local stdout = ""
