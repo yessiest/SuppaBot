@@ -7,6 +7,16 @@ It features a highly customizable environment, scripting, cron-like tasks for co
 
 This bot runs on [luvit](https://luvit.io) framework using [discordia library](https://github.com/SinisterRectus/discordia)
 
+First, [install luvit runtime](https://luvit.io/install.html) and discordia library using lit.
+```
+lit install SinisterRectus/discordia
+```
+Then, place the token for your bot into the "./token" file (newlines excluded).
+
+Lastly, enable the plugins you need on your server using the ``enable`` command. <br />
+To see which plugins are available, use the ``plugins`` command. <br />
+Default prefix for every server is ``/``
+
 ## Wiki
 
 There is no wiki, not yet at the very least.
