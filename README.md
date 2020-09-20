@@ -21,8 +21,7 @@ Default prefix for every server is ``/``
 
 ## Wiki
 
-There is no wiki, not yet at the very least.
-Would be neat though.
+This bot has its own [wiki](https://github.com/yessiest/SuppaBot/wiki) page for explanations that don't fit into a single embed.
 
 ## Contribute
 <details>
