@@ -105,7 +105,7 @@ segment.commands = {
         "Administrator"
       }
     },
-    exec = function(msg,args,opts)<link here> (ALLAN PLEASE ADD DETAILS)
+    exec = function(msg,args,opts)
       create_shell(msg)
       local script = msg.content:match("```(.+)```")
       local meta = shell.parse_meta_properties(script)
