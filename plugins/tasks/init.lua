@@ -206,7 +206,7 @@ additional examples can be found at <link here> (ALLAN PLEASE ADD DETAILS)
       }})
     end
   },
-  ["remove-task"] = {
+  ["task-remove"] = {
     help = {embed = {
       title = "Remove a task",
       description = "That one is self-descriptive",
