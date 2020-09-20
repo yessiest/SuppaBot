@@ -31,7 +31,7 @@ I'm not saying you can't, I'm saying you shouldn't.
 The code itself is a flaming mess, and, probably, it will remain in that state.
 </details>
 
-However, if you are willing to contribute for some reason particular reason,
+However, if you are willing to contribute for some particular reason,
 be it your will to fix the code or fix a typo in the readme or something else,
 feel free to do anything you like to and send a pull request afterwards.
 
