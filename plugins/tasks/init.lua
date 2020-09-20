@@ -65,7 +65,12 @@ local function addEventTask(task)
         for k,v in pairs(args or {}) do
           content = content:gsub("%$"..k,tostring(v))
         end
-        emulate.send(getLastMessageOf(task.channel,task.member),{
+        local dupeable = getLastMessageOf(task.channel,task.member)
+        if not dupeable then
+          log("ERROR","Failed to dupe a message properly")
+          return nil
+        end
+        emulate.send(dupeable,{
           content = content,
           delete = function() end
         })
