@@ -121,7 +121,7 @@ segment.commands = {
       msg:reply("Script "..meta.name.." added successfully")
     end
   },
-  ["script-delete"] = {
+  ["script-remove"] = {
     help = {embed={
       title = "Remove a script",
       description = "For more information, see <link here> (ALLAN PLEASE ADD DETAILS)",
