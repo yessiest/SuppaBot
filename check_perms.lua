@@ -1,13 +1,5 @@
 local function check_perms(member,guild,channel,perms_check)
-  if not guild.owner then
-    print("Exclusively weird behaviour: no guild owner for guild "..tostring(guild.id))
-    print("Here's a view of all the properties of the guild object: ")
-    for k,v in pairs(guild) do
-      print(tostring(k)..": ",v)
-    end
-    return false
-  end
-  if guild.owner.id == member.id then
+  if guild.ownerId == tostring(member.id) then
     return true
   end
   local permissions = member:getPermissions(channel):toTable()
