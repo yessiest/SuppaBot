@@ -1,12 +1,7 @@
-# Suppa Bot: a bot that exists for some reason
+# Suppa Bot 
 
-Welcome.
-You have reached that point in life where you're about to witness true horror.
-There is nothing stopping you from leaving.
-
-However,
-if you decide to stay just to witness the marvelous wonders of over-engineering and bad ideas,
-then you're at the right place.
+Suppa Bot is a plugin based multi-purpose discord bot written in Lua.
+It features a highly customizable environment, scripting, cron-like tasks for commands, and more.
 
 ## Installation
 
@@ -18,10 +13,16 @@ There is no wiki, not yet at the very least.
 Would be neat though.
 
 ## Contribute
-
-**Don't.**
+<details>
+<summary> Preface </summary>
+Preferrably, don't.
 I'm not saying you can't, I'm saying you shouldn't.
-Sincerely, the human error that created this bot.
+The code itself is a flaming mess, and, probably, it will remain in that state.
+</details>
+
+However, if you are willing to contribute for some reason particular reason,
+be it your will to 
+feel free to do anything you like to and send a pull request afterwards.
 
 ## Versioning conventions
 
