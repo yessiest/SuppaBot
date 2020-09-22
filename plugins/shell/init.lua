@@ -12,21 +12,29 @@ segment.help = "Metashell is a plugin designed to let you handle commands in bat
 local variables = file.readJSON("./servers/"..id.."/variables.json",{})
 local scripts = file.readJSON("./servers/"..id.."/scripts.json",{})
 local delay = discordia.Stopwatch()
+local shell_module = require("shell")
 --these will be used to store our new command environment and our shell
 local env
 local shell
 --this stores the shell generator
 function create_shell(msg)
   if ((not shell) or (segment.last_shell_channel ~= msg.channel.id)) and env then
+    events:removeAllListeners("print")
     events:on("print",function(thing)
       if delay:getTime():toSeconds() > 2 then
+        print(msg.channel.name)
         msg:reply(thing)
         delay:reset()
       end
     end)
-    local emulate_function = function(text) return env.sendAwait(msg,text) end
-    local emulate_function_no_output = function(text) env.sendAwaitNoOutput(msg,text) end
-    shell = require("shell")({
+    local emulate_function = function(text)
+      return env.sendAwait(msg,text)
+    end
+    local emulate_function_no_output = function(text)
+      env.sendAwaitNoOutput(msg,text);
+    end
+    shell = nil
+    shell = shell_module({
       emulate = emulate_function,
       emulateNoOutput = emulate_function_no_output,
       json = json
@@ -109,6 +117,10 @@ segment.commands = {
     exec = function(msg,args,opts)
       create_shell(msg)
       local script = msg.content:match("```(.+)```")
+      if not script then
+        msg:reply("Invalid syntax")
+        return
+      end
       local meta = shell.parse_meta_properties(script)
       if not meta.name then
         msg:reply("You have to provide a name for the script with ``@name = `` metaproperty")
