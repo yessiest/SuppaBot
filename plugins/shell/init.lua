@@ -22,7 +22,6 @@ function create_shell(msg)
     events:removeAllListeners("print")
     events:on("print",function(thing)
       if delay:getTime():toSeconds() > 2 then
-        print(msg.channel.name)
         msg:reply(thing)
         delay:reset()
       end
