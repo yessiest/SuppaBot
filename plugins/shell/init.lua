@@ -17,7 +17,7 @@ local env
 local shell
 --this stores the shell generator
 function create_shell(msg)
-  if (not shell) and env then
+  if ((not shell) or (segment.last_shell_channel ~= msg.channel.id)) and env then
     events:on("print",function(thing)
       if delay:getTime():toSeconds() > 2 then
         msg:reply(thing)
@@ -31,6 +31,7 @@ function create_shell(msg)
       emulateNoOutput = emulate_function_no_output,
       json = json
     })
+    segment.last_shell_channel = msg.channel.id
   else
     if not env then
       error("Attempted to create a shell without an environment")
