@@ -2,6 +2,8 @@ local segment = {}
 segment.help = [[
 This plugin contains some miscellaneous features that didn't exactly fit on their own
 ]]
+local markov = require("markov")
+local markov_instance = markov.new()
 local utilities = require("bot_utils")
 math.randomseed(os.time()+os.clock())
 local function gen_help(title,description,usage,opts)
@@ -80,52 +82,6 @@ segment.commands = {
 			msg:reply(out)
 		end,
 	},
-	["speak"] = {
-		help = gen_help("speak","Repeats the message, but suppresses the pings","speak <things>","-u, --unescape: remove escape sequences"),
-		args = {
-			"string"
-		},
-		exec = function(msg,args,opts)
-			local text = table.concat(args," "):gsub("@","\\@"):gsub("#","\\#")
-			if opts["unescape"] or opts["u"] then
-				text = text:gsub("\\","")
-			end
-			msg:reply(text)
-			msg:delete()
-		end,
-	},
-	["adminSpeak"] = {
-		help = gen_help("speak","Repeats the message without suppressing pings (requires permission to ping everyone)","speak <things>","-u, --unescape: remove escape sequences"),
-		args = {
-			"string"
-		},
-		exec = function(msg,args,opts)
-			local text = table.concat(args," ")
-			if opts["unescape"] or opts["u"] then
-				text = text:gsub("\\","")
-			end
-			msg:reply(text)
-			msg:delete()
-		end,
-		perms = {
-			perms = {
-				"mentionEveryone"
-			}
-		}
-	},
-	["echo"] = {
-		help = gen_help("echo","Repeats the message, but suppresses the pings","speak <things>","-u, --unescape: remove escape sequences"),
-		args = {
-			"string"
-		},
-		exec = function(msg,args,opts)
-			local text = table.concat(args," "):gsub("@","\\@"):gsub("#","\\#")
-			if opts["unescape"] or opts["u"] then
-				text = text:gsub("\\","")
-			end
-			msg:reply(text)
-		end,
-	},
 	["calculate"] = {
 		help = gen_help("calculate","Calculate maths using lua's interpeter. Math functions from C included, use ``sin(x)`` or ``cos(x)`` for example","calculate <expression>"),
 		args = {
@@ -161,47 +117,19 @@ segment.commands = {
 			end
 		end,
 	},
-	["server"] = {
-		help = gen_help("server","Show server stats in a form of embed","server"),
+	["markov"] = {
+		help = gen_help("markov","Generate some text using markov chains","markov <text to start with>","--preset=<preset> - Select a text preset. Currently available: ``default``"),
 		exec = function(msg,args,opts)
-			msg:reply({embed = {
-				thumbnail = {
-					url = msg.guild.iconURL
-				},
-				title = msg.guild.name,
-				description = msg.guild.description,
-				fields = {
-					{name = "Members",value = msg.guild.totalMemberCount,inline = true},
-					{name = "Owner",value = (msg.guild.owner and msg.guild.owner.user.tag..":"..msg.guild.owner.user.id),inline = true},
-					{name = "Created At",value = os.date("!%c",msg.guild.createdAt).." (UTC+0)",inline = true},
-					{name = "Text Channels",value = msg.guild.textChannels:count(),inline = true},
-					{name = "Voice Channels",value = msg.guild.voiceChannels:count(),inline = true}
-				}
-			}})
-		end,
-	},
-	["user"] = {
-		help = gen_help("user","View user stats","user <user or none>"),
-		exec = function(msg,args,opts)
-			local member = msg.guild:getMember((args[1] or ""):match("%d+")) or msg.guild:getMember(msg.author.id)
-			local roles = ""
-			for k,v in pairs(member.roles) do
-				roles = roles..v.mentionString.."\n"
+			local word = args[1]:match("%w+$")
+			local preset,code,err = require("file").readJSON("./resources/"..(opts["preset"] or "default")..".json",{system_failed = true})
+			if preset.system_failed then
+				msg:reply("No such preset")
+				return
 			end
-			msg:reply({embed = {
-				title = member.user.tag..":"..member.user.id,
-				thumbnail = {
-					url = member.user:getAvatarURL()
-				},
-				fields = {
-					{name = "Profile Created At",value = os.date("!%c",member.user.createdAt).." (UTC+0)"},
-					{name = "Joined At",value = os.date("!%c",discordia.Date.fromISO(member.joinedAt):toSeconds()).." (UTC+0)",inline = true},
-					{name = "Boosting",value = ((member.premiumSince and "Since "..member.premiumSince) or "No"),inline = true},
-					{name = "Highest Role",value = member.highestRole.mentionString,inline = true},
-					{name = "Roles",value = roles,inline = true}
-				}
-			}})
-		end,
+			markov_instance:load_state(preset)
+			local output = markov_instance:run(word)
+			msg:reply(args[1]:gsub(word.."$","",1)..output)
+		end
 	}
 }
 
