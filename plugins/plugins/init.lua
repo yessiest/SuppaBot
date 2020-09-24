@@ -43,7 +43,7 @@ adding its commands to the command pool]],
       color = discordia.Color.fromHex("ff5100").value
     }},
     exec = function(msg,args,opts)
-      local status,message = plugins.load("./plugins/"..args[1].."/init.lua")
+      local status,message = plugins.load("./plugins/"..args[1]:match("%w+").."/init.lua")
       local plugin_data = plugins.get()
       local embed = {
         description = message,
@@ -73,7 +73,7 @@ removing its commands from the command pool]],
     exec = function(msg,args,opts)
       local plugin_data = plugins.get()
       if not (args[1] == "plugins") then
-        local status,message = plugins.unload("./plugins/"..args[1].."/init.lua")
+        local status,message = plugins.unload("./plugins/"..args[1]:match("%w+").."/init.lua")
         local embed = {
           description = message,
           color = discordia.Color.fromHex("ff5100").value,

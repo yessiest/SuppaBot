@@ -125,7 +125,7 @@ segment.commands = {
 ``reddit`` - Generated from reddit comments
 ]]),
 		exec = function(msg,args,opts)
-			local preset,code,err = require("file").readJSON("./resources/"..(opts["preset"] or "default")..".json",{system_failed = true})
+			local preset,code,err = require("file").readJSON("./resources/"..(opts["preset"] or "default"):match("%w+")..".json",{system_failed = true})
 			if preset.system_failed then
 				msg:reply("No such preset")
 				return
