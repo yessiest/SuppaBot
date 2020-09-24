@@ -118,16 +118,20 @@ segment.commands = {
 		end,
 	},
 	["markov"] = {
-		help = gen_help("markov","Generate some text using markov chains","markov <text to start with>","--preset=<preset> - Select a text preset. Currently available: ``default``"),
+		help = gen_help("markov","Generate some text using markov chains","markov <text to start with>",[[
+--preset=<preset> - Select a text preset. Currently available:
+``default`` - Generated from a wikipedia page on markov chains
+``freud`` - The largest one, generated from a page on Sigmund Freud
+``reddit`` - Generated from reddit comments
+]]),
 		exec = function(msg,args,opts)
-			local word = args[1]:match("%w+$")
 			local preset,code,err = require("file").readJSON("./resources/"..(opts["preset"] or "default")..".json",{system_failed = true})
 			if preset.system_failed then
 				msg:reply("No such preset")
 				return
 			end
 			markov_instance:load_state(preset)
-			local output = markov_instance:run(word,100)
+			local output = markov_instance:run("The",100)
 			msg:reply(args[1]:gsub(word.."$","",1)..output)
 		end
 	}
