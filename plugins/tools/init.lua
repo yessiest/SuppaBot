@@ -132,7 +132,7 @@ segment.commands = {
 			end
 			markov_instance:load_state(preset)
 			local output = markov_instance:run("The",100)
-			msg:reply(args[1]:gsub(word.."$","",1)..output)
+			msg:reply(output)
 		end
 	}
 }
