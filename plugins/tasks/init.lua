@@ -21,6 +21,7 @@ local function cronTime(time)
   end
   local mask = {60,24,32,13}
   local tokens = {}
+  local err = false
   time:gsub("[%d%*]+",function(c) table.insert(tokens,c) end,4)
   for I = 1,4 do --check if date/time format matches
     if not ((tokens[I]:match("%d+") and tonumber(tokens[I]) < mask[I]) or ((tokens[I] == "*") and (I > 1)))  then
