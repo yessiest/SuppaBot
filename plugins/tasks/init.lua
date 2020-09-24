@@ -150,7 +150,11 @@ additional examples can be found at https://github.com/yessiest/SuppaBot/wiki/Ta
           description = opts["description"] or "",
           once = opts["once"]
         })
-        msg:reply("Task "..(#segment.tab).." added")
+        if status then
+          msg:reply("Task "..(#segment.tab).." added")
+        else
+          msg:reply("Failed to add task")
+        end
       elseif args[1]:match("^ ?%d+ [%d*]+ [%d*]+ [%d*]+ ?$") then
         local status = addTimeTask({
           type = "time",
@@ -161,7 +165,11 @@ additional examples can be found at https://github.com/yessiest/SuppaBot/wiki/Ta
           description = opts["description"] or "",
           once = opts["once"]
         })
-        msg:reply("Task "..(#segment.tab).." added")
+        if status then
+          msg:reply("Task "..(#segment.tab).." added")
+        else
+          msg:reply("Failed to add task")
+        end
       else
         msg:reply("Syntax error")
       end
