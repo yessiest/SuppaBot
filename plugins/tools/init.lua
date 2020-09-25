@@ -123,6 +123,7 @@ segment.commands = {
 ``default`` - Generated from a wikipedia page on markov chains
 ``freud`` - The largest one, generated from a page on Sigmund Freud
 ``reddit`` - Generated from reddit comments
+``travisscott`` - Generated from transcript of a video by PlasticPills on travis scott burger
 ]]),
 		exec = function(msg,args,opts)
 			local preset,code,err = require("file").readJSON("./resources/"..(opts["preset"] or "default"):match("%w+")..".json",{system_failed = true})
