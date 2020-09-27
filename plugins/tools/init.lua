@@ -17,6 +17,28 @@ local function gen_help(title,description,usage,opts)
 		}
 	}}
 end
+
+local safe_clone = function(tab,disallow)
+	local new_tab = {}
+	for k,v in pairs(tab) do
+		if not disallow[k] then
+			new_tab[k] = v
+		end
+	end
+	return new_tab
+end
+
+function to_bit_string(num)
+    local t=""
+		local rest
+    while num>0 do
+        rest=math.fmod(num,2)
+        t=t..rest
+        num=(num-rest)/2
+    end
+    return t
+end
+
 segment.commands = {
 	["flip"] = {
 		help = gen_help("flip","Flips a coin, obv.","flip"),
@@ -83,7 +105,10 @@ segment.commands = {
 		end,
 	},
 	["calculate"] = {
-		help = gen_help("calculate","Calculate maths using lua's interpeter. Math functions from C included, use ``sin(x)`` or ``cos(x)`` for example","calculate <expression>"),
+		help = gen_help("calculate","Calculate maths using lua's interpeter. Math functions from C included, use ``sin(x)`` or ``cos(x)`` for example. Additionally, BitOp module is included with the name ``bit`` (example: ``bit.bnot(1,1)``)","calculate <expression>",[[
+``--bit``; ``-b`` - if the output is a number, convert it to binary
+``--hex``; ``-h`` - if the output is a number, convert it to hexadecimal
+		]]),
 		args = {
 			"string"
 		},
@@ -93,14 +118,20 @@ segment.commands = {
 			end
 			segment.calculation_coroutine = coroutine.wrap(function()
 				local sandbox = {}
-				for k,v in pairs(math) do
-					sandbox[k] = v
-				end
-				local state,answer = pcall(load("return "..(table.concat(args," ") or ""),"calc",nil,setmetatable(sandbox,{})))
+				sandbox = safe_clone(math,{randomseed = true})
+				sandbox["bit"] = safe_clone(bit,{})
+				local state,answer = pcall(load("return "..(table.concat(args," ") or ""),"calc","t",setmetatable(sandbox,{})))
 				if state then
+					if type(answer) == "number" then
+						if opts["bit"] or opts["b"] then
+							answer = "0b"..to_bit_string(answer)
+						elseif opts["hex"] or opts["h"] then
+							answer = "0x"..bit.tohex(answer)
+						end
+					end
 					msg:reply(tostring(answer))
 				else
-					msg:reply("Syntax error")
+					msg:reply(answer)
 				end
 			end)
 			segment.calculation_coroutine()
