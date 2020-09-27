@@ -36,7 +36,7 @@ function to_bit_string(num)
         t=t..rest
         num=(num-rest)/2
     end
-    return t
+    return t:reverse()
 end
 
 segment.commands = {
