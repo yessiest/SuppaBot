@@ -1,4 +1,7 @@
 local function check_perms(member,guild,channel,perms_check)
+  if member.user.bot then
+    return false
+  end
   if guild.ownerId == tostring(member.id) then
     return true
   end
