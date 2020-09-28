@@ -168,7 +168,7 @@ segment.commands = {
 		end
 	},
 	["embed"] = {
-		help = {emned = {
+		help = {embed = {
 			title = "Convert JSON objects into embeds",
 			description = "If you've worked with discord.js before, this might be simple. If you haven't, then check out https://github.com/yessiest/SuppaBot/wiki/Embeds",
 			fields = {
