@@ -166,6 +166,33 @@ segment.commands = {
 			local output = markov_instance:run("The",100)
 			msg:reply(output)
 		end
+	},
+	["embed"] = {
+		help = {emned = {
+			title = "Convert JSON objects into embeds",
+			description = "If you've worked with discord.js before, this might be simple. If you haven't, then check out https://github.com/yessiest/SuppaBot/wiki/Embeds",
+			fields = {
+				{name = "Usage:",value = "embed <embed object>"},
+				{name = "Perms:",value = "all"}
+			}
+		}},
+		args = {
+			"string"
+		},
+		exec = function(msg,args,opts)
+			local embed = msg.content:match("{.+}")
+			if not embed then
+				msg:reply("Invalid embed object")
+				return
+			end
+			local embed_obj,code,err = require("json").decode(embed)
+			if not embed_obj then
+				msg:reply("Error while decoding JSON object: "..tostring(err))
+				return
+			end
+			embed_obj.color = discordia.Color.fromHex(embed_obj.color).value
+			msg:reply({embed = embed_obj})
+		end
 	}
 }
 
