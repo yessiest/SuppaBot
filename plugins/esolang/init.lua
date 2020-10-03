@@ -13,7 +13,7 @@ segment.commands = {
   ["brainfuck"] = {
     help = {embed = {
       title = "Run brainfuck code",
-      description = "specification can be found at <wiki link here> (ALLAN. PLS.)",
+      description = "specification can be found at https://esolangs.org/wiki/brainfuck",
       color = discordia.Color.fromHex("#32cd32").value,
       fields = {
          {name = "Usage: ",value = "brainfuck <brainfuck code> [<input>]"},
@@ -57,7 +57,7 @@ segment.commands = {
   ["befunge"] = {
     help = {embed = {
       title = "Run befunge-93 code",
-      description = "specification can be found at <wiki link here> (ALLAN. PLS.)",
+      description = "specification can be found at https://esolangs.org/wiki/befunge",
       fields = {
         {name = "Usage: ",value = "befunge \\`\\`\\`<code here>\\`\\`\\` [<input>]"},
         {name = "Perms: ",value = "all"}
