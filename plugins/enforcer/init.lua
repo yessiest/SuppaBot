@@ -400,6 +400,50 @@ segment.commands = {
       end
     end
   },
+  ["add-role"] = {
+    help = {embed={
+      title = "Give some specific user a role",
+      descriptions = "self-descriptive",
+      fields = {
+        {name = "Usage: ",value = "unwarn <member> <role>"},
+        {name = "Perms: ",value = "manageRoles"}
+      }
+    }},
+    perms = {
+      perms = {
+        "manageRoles"
+      }
+    },
+    args = {
+      "member",
+      "role"
+    },
+    exec = function(msg,args,opts)
+      args[1]:addRole(tostring(args[2].id))
+    end
+  },
+  ["remove-role"] = {
+    help = {embed={
+      title = "Revoke a role from a user",
+      descriptions = "self-descriptive",
+      fields = {
+        {name = "Usage: ",value = "remove-role <member> <role>"},
+        {name = "Perms: ",value = "manageRoles"}
+      }
+    }},
+    perms = {
+      perms = {
+        "manageRoles"
+      }
+    },
+    args = {
+      "member",
+      "role"
+    },
+    exec = function(msg,args,opts)
+      args[1]:removeRole(tostring(args[2].id))
+    end
+  },
 }
 
 events:on("memberUpdate",function(member)
