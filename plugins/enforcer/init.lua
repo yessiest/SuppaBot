@@ -47,7 +47,7 @@ local warn = function(ID,reason)
       member:ban("Warning quota exceeded.",segment.settings.ban_days)
     end
   end
-  _ = (client:getUser(tostring(ID)) and client:getUser(tostring(ID)):send("You have been warned for: "..reason))
+  _ = (client:getUser(tostring(ID)) and client:getUser(tostring(ID)):send("__You have been warned.__\nReason: "..reason))
   signals:emit("warn",function(args)
     if args[1] and member.name:find(args[1],1,true) then
       return true
