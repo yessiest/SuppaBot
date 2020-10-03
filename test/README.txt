@@ -1,0 +1,1 @@
+This folder is a test plugin designed to test the plugin system. Feel free to use it as a reference for writing your own plugins (if you would ever do that for some reason. this is as much documentation as you can get from this)
