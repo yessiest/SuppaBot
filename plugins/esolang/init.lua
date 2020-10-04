@@ -36,7 +36,7 @@ segment.commands = {
           result = ""
         end
         if not err then
-          if opts["-o"] or opts["--output-only"] then
+          if opts["o"] or opts["output-only"] then
             msg:reply(tostring(result))
           else
             msg:reply({ embed = {
@@ -116,7 +116,7 @@ segment.commands = {
         end
       })
       local opcount = befunge:run()
-      if opts["-o"] or opts["--output-only"] then
+      if opts["o"] or opts["output-only"] then
         msg:reply(tostring(stdout))
       else
         msg:reply({embed = {
