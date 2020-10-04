@@ -18,6 +18,9 @@ segment.commands = {
       fields = {
          {name = "Usage: ",value = "brainfuck <brainfuck code> [<input>]"},
          {name = "Perms: ",value = "all"},
+         {name = "Options: ",value = [[
+ -o; --output-only  -  print only the output, without an embed
+         ]]}
       }
     }},
     args = {
@@ -33,19 +36,23 @@ segment.commands = {
           result = ""
         end
         if not err then
-          msg:reply({ embed = {
-            title = "Result:",
-            color = discordia.Color.fromHex("#32cd32").value,
-            description = "```"..tostring(result).."```",
-            footer = {
-              text = "Finished in "..opcount.." operations"
-            }
-          }})
+          if opts["-o"] or opts["--output-only"] then
+            msg:reply(tostring(result))
+          else
+            msg:reply({ embed = {
+              title = "Result:",
+              color = discordia.Color.fromHex("#32cd32").value,
+              description = "```"..tostring(result).." ```",
+              footer = {
+               text = "Finished in "..opcount.." operations"
+              }
+            }})
+          end
         else
           msg:reply({
             embed = {
               title = "Error:",
-              description = "```"..tostring(err).."```",
+              description = "```"..tostring(err).." ```",
               color = discordia.Color.fromHex("#32cd32").value,
             }
           })
@@ -60,7 +67,10 @@ segment.commands = {
       description = "specification can be found at https://esolangs.org/wiki/befunge",
       fields = {
         {name = "Usage: ",value = "befunge \\`\\`\\`<code here>\\`\\`\\` [<input>]"},
-        {name = "Perms: ",value = "all"}
+        {name = "Perms: ",value = "all"},
+        {name = "Options: ",value = [[
+-o; --output-only  -  print only the output, without an embed
+        ]]}
       },
       color = discordia.Color.fromHex("#32cd32").value,
     }},
@@ -106,17 +116,21 @@ segment.commands = {
         end
       })
       local opcount = befunge:run()
-      msg:reply({embed = {
-        title = "Result: ",
-        color = discordia.Color.fromHex("#32cd32").value,
-        fields = {
-          {name = "out",value = "```"..stdout.." ```"},
-          {name = "err",value = "```"..stderr.." ```"}
-        },
-        footer = {
-          text = "Finished in "..opcount.." operations"
-        }
-      }})
+      if opts["-o"] or opts["--output-only"] then
+        msg:reply(tostring(stdout))
+      else
+        msg:reply({embed = {
+          title = "Result: ",
+          color = discordia.Color.fromHex("#32cd32").value,
+          fields = {
+            {name = "out",value = "```"..stdout.." ```"},
+            {name = "err",value = "```"..stderr.." ```"}
+          },
+          footer = {
+            text = "Finished in "..opcount.." operations"
+          }
+        }})
+      end
     end
   }
 }

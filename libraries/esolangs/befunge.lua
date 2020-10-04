@@ -366,7 +366,6 @@ function befunge:init(source,args)
     ["&"] = function(field,head)
       local v = args.handle_int_input()
       if not v then
-        args.handle_warning("Input tape ended, but a request for input still happened")
         v = -1
       end
       head:push(v)
@@ -374,7 +373,6 @@ function befunge:init(source,args)
     ["~"] = function(field,head)
       local v = args.handle_input()
       if not v then
-        args.handle_warning("Input tape ended, but a request for input still happened")
         v = -1
       end
       head:push(v)
@@ -383,7 +381,7 @@ function befunge:init(source,args)
       local y,x = head:pop(),head:pop()
       local value = head:pop()
       if not (y or x or value) then
-        warn_args(field,head)
+        args.handle_error("Attempted to call \"put\" operator with less than 3 arguments")
         return
       end
       y,x = y+1,x+1
@@ -400,7 +398,7 @@ function befunge:init(source,args)
     ["g"] = function(field,head)
       local y,x = head:pop(),head:pop()
       if not (y or x) then
-        warn_args(field,head)
+        args.handle_error("Attempted to call \"get\" operator with less than 3 arguments")
         return
       end
       y,x = y+1,x+1
