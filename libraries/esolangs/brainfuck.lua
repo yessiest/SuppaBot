@@ -1,38 +1,34 @@
---TODO: fix this mess of useless code
-local match_bracket = function(position,text,mode,match_left,match_right)
-  assert(type(position) == "number" and type(text) == "table" and (type(mode) == "boolean" or type(mode) == "nil"),"Expected number,table[,bool], got "..type(position)..type(text)..type(mode))
-  local matching,level,last_matching,scroll = nil,1,nil,nil
-  if not mode then
-    matchables = {match_left,match_right}
-    scroll = 1
+local function find_bracket(text,left_br,right_br,start)
+  local top,pos,remaining_string = 0,0,text:sub(start,-1)
+  local match_start,match_end = remaining_string:find("["..left_br..right_br.."]")
+  while match_end do
+    pos = pos + match_end
+    if remaining_string:sub(match_end,match_end):match(left_br) then
+      top = top + 1
+    elseif remaining_string:sub(match_end,match_end):match(right_br) then
+      top = top - 1
+    end
+    if top == 0 then
+      break
+    end
+    remaining_string = remaining_string:sub(match_end+1,-1)
+    match_start,match_end = remaining_string:find("["..left_br..right_br.."]")
+  end
+  if match_end then
+    return pos+start-1
   else
-    matchables = {match_right,match_left}
-    scroll = -1
+    return nil
   end
-  --enter "matching" mode - no tokens executed
-  while not matching do
-      position = position + scroll
-    --find last matching token in case the code tape has ended
-    if text[position] == nil then
-      matching = last_matching
-      if not matching then
-        return nil,"No matching brackets."
-      end
-    end
-    if text[position] == matchables[1] then
-      level = level + 1
-    elseif text[position] == matchables[2] then
-      --store in case of asymmetric topology
-      last_matching = position
-      if level == 1 then
-        matching = position
-      end
-      level = level - 1
-    end
-  end
-  return matching
 end
-local file = require("file")
+
+local function reverse_find_bracket(text,left_br,right_br,start)
+  local str = text:reverse()
+  local start = (string.len(text)-start)
+  v = find_bracket(str,right_br,left_br,start+1)-1
+  v = text:len()-v
+  return v
+end
+
 local bf = {}
 --create interpreter object. created for each code chunk as tape reinitialization is required to run new code.
 bf.new = function(input,options)
@@ -41,7 +37,7 @@ bf.new = function(input,options)
   assert(type(input) == "string","Expected argument #1 of type string, got "..type(input))
 
   --generate the prototype and attach functions to it
-  local self = {file_buffer = {}, tape = {}, pointer = 1, counter = 1, program = {}, stack = {}, file_pointer = 0}
+  local self = {tape = {}, pointer = 1, counter = 1, program = {}, stack = {}}
   input:gsub(".",function(capt) self.program[#self.program + 1] = capt end)
   setmetatable(self, {__index = bf})
 
@@ -49,7 +45,6 @@ bf.new = function(input,options)
   if not options then options = {} end
   self.options = {}
   self.options.tapesize = options.tapesize or 30000
-  self.options.cellsize = options.cellsize or 1
   self.options.dump_char = options.dump_char or "$" --extension lv3 goes against debug conventions.
   self.options.debug_char = options.debug_char or "%"
   self.options.dump_capacity = options.dump_capacity or 30
@@ -75,14 +70,14 @@ bf.new = function(input,options)
   end
   self.tokens["+"] = function()
     self.tape[self.pointer] = self.tape[self.pointer] + 1
-    if self.tape[self.pointer] > (256^self.options.cellsize)-1 then
+    if self.tape[self.pointer] > 255 then
       self.tape[self.pointer] = 0
     end
   end
   self.tokens["-"] = function()
     self.tape[self.pointer] = self.tape[self.pointer] - 1
     if self.tape[self.pointer] < 0 then
-      self.tape[self.pointer] = (256^self.options.cellsize)-1
+      self.tape[self.pointer] = 255
     end
   end
   self.tokens["."] = function()
@@ -98,21 +93,23 @@ bf.new = function(input,options)
   end
   self.tokens["["] = function()
     if self.tape[self.pointer] == 0 then
-    local count,err = match_bracket(self.counter,self.program,false,"[","]")
-      if err then self.tokens["@"](); self.errmsg = "structure error at "..self.pointer else
+      local count = find_bracket(table.concat(self.program),"%[","%]",self.counter)
+      if not count then self.tokens["@"](); self.errmsg = "structure error at "..self.pointer else
         self.counter = count
       end
     end
   end
   self.tokens["]"] = function()
     if self.tape[self.pointer] ~= 0 then
-      local count,err = match_bracket(self.counter,self.program,true,"[","]")
-      if err then self.tokens["@"](); self.errmsg = "structure error at "..self.pointer else
+      local count = reverse_find_bracket(table.concat(self.program),"%[","%]",self.counter)
+      if not count then self.tokens["@"](); self.errmsg = "structure error at "..self.pointer else
         self.counter = count
       end
     end
   end
-
+  self.tokens["@"] = function()
+    self.program[self.counter+1] = nil
+  end
   --start debug tokens
   if self.options.debug then
 
@@ -177,8 +174,6 @@ bf.run = function(self,input)
     self.program = self.default_program
     self.counter = 1
     self.pointer = 1
-    self.file_pointer = 1
-    self.file_buffer = {}
   end
 
 
@@ -201,27 +196,20 @@ bf.run = function(self,input)
       self.tokens[self.program[self.counter]]()
       prgcount = prgcount+1 --counts the total amount of operations. useful during debugging.
       if self.debug then
-       self.output =self.output.."\n".."cycle: "..prgcount.."; token: "..self.program[self.counter]..", "..self.counter.."; memory: #"..self.pointer..", "..self.tape[self.pointer]
+        self.output =self.output.."\n".."cycle: "..prgcount.."; token: "..self.program[self.counter]..", "..self.counter.."; memory: #"..self.pointer..", "..self.tape[self.pointer]
+        print("cycle: "..prgcount.."; token: "..self.program[self.counter]..", "..self.counter.."; memory: #"..self.pointer..", "..self.tape[self.pointer])
         if self.options.ext1 then
          self.output =self.output.."; storage: "..self.storage
         end
        self.output =self.output.."\n"
       end
       if self.oplimit and prgcount > self.oplimit then
-	self.errmsg = "operation limit reached"
-	break
+	       self.errmsg = "operation limit reached"
+	       break
       end
     end
     self.counter = self.counter + 1 --[1]
   end
-
-
-  for k,v in pairs(self.file_buffer) do
-    local temporary_file = io.open(tostring(k),"w")
-    temporary_file:write(v)
-    temporary_file:close()
-  end
-
   self.init = true
   return self.output,prgcount,self.errmsg
 end
