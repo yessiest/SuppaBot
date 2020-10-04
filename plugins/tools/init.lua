@@ -120,7 +120,25 @@ segment.commands = {
 				local sandbox = {}
 				sandbox = safe_clone(math,{randomseed = true})
 				sandbox["bit"] = safe_clone(bit,{})
-				local state,answer = pcall(load("return "..(table.concat(args," ") or ""),"calc","t",setmetatable(sandbox,{})))
+				local expression = (table.concat(args," ") or "")
+				local exception_keywords = { --this causes too much trouble
+					"while",
+					"function",
+					"for",
+					"if",
+					"then",
+					"do",
+					"end",
+					"repeat",
+					"until"
+				}
+				for k,v in pairs(exception_keywords) do
+					if expression:find(v) then
+						msg:reply("Invalid syntax")
+						return
+					end
+				end
+				local state,answer = pcall(load("return "..expression,"calc","t",setmetatable(sandbox,{})))
 				if state then
 					if type(answer) == "number" then
 						if opts["bit"] or opts["b"] then
