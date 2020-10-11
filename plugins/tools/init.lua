@@ -160,9 +160,9 @@ segment.commands = {
 		exec = function(msg,args,opts)
 			local user = client:getUser((args[1] or ""):match("%d+"))
 			if user then
-				msg:reply(user:getAvatarURL())
+				msg:reply(user:getAvatarURL().."?size=2048")
 			else
-				msg:reply(msg.author:getAvatarURL())
+				msg:reply(msg.author:getAvatarURL().."?size=2048")
 			end
 		end,
 	},
