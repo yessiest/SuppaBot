@@ -16,6 +16,14 @@ local getEmoji = function(id)
   end
 end
 
+local function count(tab)
+  local n = 0
+  for k,v in pairs(tab) do
+    n = n + 1
+  end
+  return n
+end
+
 segment.commands = {
   ["pivot"] = {
     help = {
@@ -35,7 +43,7 @@ segment.commands = {
       }
     },
     exec = function(msg,args,opts)
-      if segment.pivot and #segment.pivot.buttons == 0 then
+      if segment.pivot and count(segment.pivot.buttons) == 0 then
         segment.pivots[segment.pivot.id] = nil
       end
       local message = args[1]
