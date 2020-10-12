@@ -48,6 +48,7 @@ segment.commands = {
         segment.pivots[message.id].message = message.id
         segment.pivots[message.id].channel = message.channel.id
         segment.pivots[message.id].buttons = {}
+        segment.pivots[message.id].id = message.id
       end
       segment.pivot = segment.pivots[message.id]
       msg:reply("Pivot message set to "..message.link)
@@ -318,7 +319,7 @@ events:on("reactionRemoveUncached",function(channelId,messageId,hash,userId)
 end)
 
 events:on("serverSaveConfig",function()
-  file.readJSON("./servers/"..id.."/reactions.json",segment.pivots)
+  file.writeJSON("./servers/"..id.."/reactions.json",segment.pivots)
 end)
 
 return segment
