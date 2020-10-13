@@ -10,30 +10,6 @@ local settings = {
 }
 local lastExec
 
-local function purify_strings(msg,input)
-  local text = input
-  while text:match("<@(%D*)(%d*)>") do
-    local obj,id = text:match("<@(%D*)(%d*)>")
-    local substitution = ""
-    if obj:match("!") then
-      local member = msg.guild:getMember(id)
-      if member then
-        substitution = "@"..member.name
-      end
-    elseif obj:match("&") then
-      local role = msg.guild:getRole(id)
-      if role then
-        substitution = "@"..role.name
-      end
-    end
-    if substitution == "" then
-      substitution = "<\\@"..obj..id..">"
-    end
-    text = text:gsub("<@(%D*)"..id..">",substitution)
-  end
-  return text
-end
-
 segment.commands = {
   ["brainfuck"] = {
     help = {embed = {
@@ -62,7 +38,7 @@ segment.commands = {
         end
         if not err then
           if opts["o"] or opts["output-only"] then
-            msg:reply(purify_strings(msg,tostring(result)))
+            msg:reply(msg,tostring(result):gsub("@","\\@"))
           else
             msg:reply({ embed = {
               title = "Result:",
@@ -142,7 +118,7 @@ segment.commands = {
       })
       local opcount = befunge:run()
       if opts["o"] or opts["output-only"] then
-        msg:reply(purify_strings(msg,tostring(result)))
+        msg:reply(tostring(stdout):gsub("@","\\@"))
       else
         msg:reply({embed = {
           title = "Result: ",
