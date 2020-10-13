@@ -44,7 +44,7 @@ segment.commands = {
     },
     exec = function(msg,args,opts)
       if segment.pivot and count(segment.pivot.buttons) == 0 then
-        segment.pivots[segment.pivot.id] = nil
+        segment.pivots[segment.pivot.message] = nil
       end
       local message = args[1]
       if not message then
@@ -56,7 +56,6 @@ segment.commands = {
         segment.pivots[message.id].message = message.id
         segment.pivots[message.id].channel = message.channel.id
         segment.pivots[message.id].buttons = {}
-        segment.pivots[message.id].id = message.id
       end
       segment.pivot = segment.pivots[message.id]
       msg:reply("Pivot message set to "..message.link)

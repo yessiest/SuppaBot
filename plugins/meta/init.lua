@@ -228,7 +228,9 @@ More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
 			"string"
 		},
 		exec = function(msg,args,opts)
-			local text = table.concat(args," "):gsub("@","\\@"):gsub("#","\\#")
+			local text = table.concat(args," "):gsub("<@%D*(%d*)>",function(id)
+        return "@"..msg.guild:getMember(id).name
+      end)
 			if opts["unescape"] or opts["u"] then
 				text = text:gsub("\\","")
 			end
@@ -261,7 +263,9 @@ More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
       "string"
     },
     exec = function(msg,args,opts)
-      local text = table.concat(args," "):gsub("@","\\@"):gsub("#","\\#")
+      local text = table.concat(args," "):gsub("<@%D*(%d*)>",function(id)
+        return "@"..msg.guild:getMember(id).name
+      end)
       if opts["unescape"] or opts["u"] then
         text = text:gsub("\\","")
       end
