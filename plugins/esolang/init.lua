@@ -9,6 +9,31 @@ local settings = {
   limit = 500000
 }
 local lastExec
+
+local function purify_strings(msg,input)
+  local text = input
+  while text:match("<@(%D*)(%d*)>") do
+    local obj,id = text:match("<@(%D*)(%d*)>")
+    local substitution = ""
+    if obj:match("!") then
+      local member = msg.guild:getMember(id)
+      if member then
+        substitution = "@"..member.name
+      end
+    elseif obj:match("&") then
+      local role = msg.guild:getRole(id)
+      if role then
+        substitution = "@"..role.name
+      end
+    end
+    if substitution == "" then
+      substitution = "<\\@"..obj..id..">"
+    end
+    text = text:gsub("<@(%D*)"..id..">",substitution)
+  end
+  return text
+end
+
 segment.commands = {
   ["brainfuck"] = {
     help = {embed = {
@@ -37,12 +62,12 @@ segment.commands = {
         end
         if not err then
           if opts["o"] or opts["output-only"] then
-            msg:reply(tostring(result))
+            msg:reply(purify_strings(msg,tostring(result)))
           else
             msg:reply({ embed = {
               title = "Result:",
               color = discordia.Color.fromHex("#32cd32").value,
-              description = "```"..tostring(result).." ```",
+              description = "```"..tostring(result):gsub("`","\\`").." ```",
               footer = {
                text = "Finished in "..opcount.." operations"
               }
@@ -117,13 +142,13 @@ segment.commands = {
       })
       local opcount = befunge:run()
       if opts["o"] or opts["output-only"] then
-        msg:reply(tostring(stdout))
+        msg:reply(purify_strings(msg,tostring(result)))
       else
         msg:reply({embed = {
           title = "Result: ",
           color = discordia.Color.fromHex("#32cd32").value,
           fields = {
-            {name = "out",value = "```"..stdout.." ```"},
+            {name = "out",value = "```"..stdout:gsub("`","\\`").." ```"},
             {name = "err",value = "```"..stderr.." ```"}
           },
           footer = {
