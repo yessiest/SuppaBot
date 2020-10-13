@@ -20,6 +20,29 @@ local function gen_help(title,description,usage,opts)
 		}
 	}}
 end
+local function purify_strings(msg,input)
+  local text = input
+  while text:match("<@(%D*)(%d*)>") do
+    local obj,id = text:match("<@(%D*)(%d*)>")
+    local substitution = ""
+    if obj:match("!") then
+      local member = msg.guild:getMember(id)
+      if member then
+        substitution = "@"..member.name
+      end
+    elseif obj:match("&") then
+      local role = msg.guild:getRole(id)
+      if role then
+        substitution = "@"..role.name
+      end
+    end
+    if substitution == "" then
+      substitution = "<\\@"..obj..id..">"
+    end
+    text = text:gsub("<@(%D*)"..id..">",substitution)
+  end
+  return text
+end
 local utils = require("bot_utils")
 local map = require("file").readJSON("./servers/"..id.."/aliasmap.json",{})
 segment.commands = {
@@ -228,9 +251,7 @@ More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
 			"string"
 		},
 		exec = function(msg,args,opts)
-			local text = table.concat(args," "):gsub("<@%D*(%d*)>",function(id)
-        return "@"..msg.guild:getMember(id).name
-      end)
+			local text = purify_strings(msg, table.concat(args," "))
 			if opts["unescape"] or opts["u"] then
 				text = text:gsub("\\","")
 			end
@@ -239,7 +260,7 @@ More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
 		end,
 	},
 	["adminSpeak"] = {
-		help = gen_help("speak","Repeats the message without suppressing pings (requires permission to ping everyone)","speak <things>","-u, --unescape: remove escape sequences"),
+		help = gen_help("adminSpeak","Repeats the message without suppressing pings (requires permission to ping everyone)","speak <things>","-u, --unescape: remove escape sequences"),
 		args = {
 			"string"
 		},
@@ -263,9 +284,7 @@ More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
       "string"
     },
     exec = function(msg,args,opts)
-      local text = table.concat(args," "):gsub("<@%D*(%d*)>",function(id)
-        return "@"..msg.guild:getMember(id).name
-      end)
+      local text = purify_strings(msg, table.concat(args," "))
       if opts["unescape"] or opts["u"] then
         text = text:gsub("\\","")
       end
