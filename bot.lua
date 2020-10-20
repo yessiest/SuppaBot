@@ -79,6 +79,27 @@ function Server:gather_command_info()
   }
 end
 
+--these two will allow a way to extend the command pool and add objects as first class citizens
+function Server:add_command(name,command_skeleton)
+  if not self.commands[name] then
+    self.commands[name] = command_skeleton
+    return true
+  else
+    self.log("error","Collision detected for command "..k.." on plugin "..name)
+    return nil,"Collision for command "..k
+  end
+end
+
+function Server:remove_command(name)
+  if self.commands[name] then
+    self.command[name] = nil
+    return true
+  else
+    return nil,"No such command name"
+  end
+end
+
+--load and unload plugins, which will extent command pool with more commands
 function Server:load_plugin(name)
   if self.plugins[name] then
     self.log("warning","Attempted to load an already loaded plugin: "..name)
@@ -97,6 +118,8 @@ function Server:load_plugin(name)
       get = function() return self.gather_command_info(self) end,
       load = function(name) return self.load_plugin(self,name) end,
       unload = function(name) return self.unload_plugin(self,name) end,
+      add_command = function(name,comm) return self.add_command(self,name,comm) end,
+      remove_command = function(name) return self.remove_command(self,comm) end
     },
     discordia = discordia,
     require = require,
@@ -121,12 +144,9 @@ function Server:load_plugin(name)
   per_package_environment.log = self.log
   self.plugins[name].origin = load(chunk,"Plugin: "..name,"t",per_package_environment)()
   for k,v in pairs(self.plugins[name].origin.commands) do
-    if not self.commands[k] then
-      self.commands[k] = v
-    else
+    if not self.add_command(self,k,v) then
       self.unload_plugin(self,name)
-      self.log("error","Collision detected for command "..k.." on plugin "..name)
-      return nil,("Collision for command "..k)
+      return nil,"Collision for command "..k
     end
   end
   client:emit("commandPoolUpdate",self.guild)
@@ -160,7 +180,7 @@ end
 
 function Server:start()
   self.log("INFO","Loading server id "..self.id)
-  --well APPARENTLY, FOR SOME FUCKING REASON, calling self's method means passing the metatable instead of the table as an argument
+  --well APPARENTLY, FOR SOME REASON, calling self's method means passing the metatable instead of the table as an argument
   self.load_data(self)
   local autoload_list = file.readJSON("./servers/"..self.id.."/safe.json",{
     "./plugins/plugins/init.lua","./plugins/help/init.lua"
