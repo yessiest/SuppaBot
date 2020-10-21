@@ -133,7 +133,7 @@ segment.commands = {
 					"until"
 				}
 				for k,v in pairs(exception_keywords) do
-					if expression:find(v) then
+					if expression:find("%W"..v.."%W") then
 						msg:reply("Invalid syntax")
 						return
 					end
