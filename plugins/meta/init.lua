@@ -14,15 +14,17 @@ client:on("messageCreate",function(msg)
   last_message_arrived:start()
 end)
 
-local function add_alias(name,command,preix)
+local function add_alias(name,command,prefix,description)
   if (not map[name]) then
-    if type(prefix) == "nil" then
-      prefix = true
-    end
     map[name] = {comm = command,prefix = prefix}
     plugins.add_command(name,{
       help  = {embed = {
-        title = "hmmmm"
+        title = "``"..name:sub(1,32).."`` alias",
+        description = description,
+        fields = {
+          {name = "Usage:",value = ((prefix and globals.prefix) or "")..name},
+          {name = "Full command:",value = command}
+        },
       }},
       exec = function(msg,args2,opts)
         local str = msg.content:gsub(name.." ","")
@@ -36,7 +38,8 @@ local function add_alias(name,command,preix)
           content = aftersub
         })
       end,
-      noprefix = prefix,
+      noprefix = not prefix,
+      custom = true,
     })
     return true
   else
@@ -146,7 +149,7 @@ More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
       }
     },
     exec = function(msg,args,opts)
-      if add_alias(args[1],args[2],(opts["prefix"] or opts["p"])) then
+      if add_alias(args[1],args[2],(opts["prefix"] or opts["p"]),opts["description"]) then
         msg:reply("Bound ``"..args[1].."`` as an alias to ``"..args[2].."``")
       else
         msg:reply("``"..args[1].."`` is already bound")

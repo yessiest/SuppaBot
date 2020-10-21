@@ -69,9 +69,14 @@ function Server:gather_command_info()
     end
   end
   for k,v in pairs(self.commands) do
-    --generate a proxy for commands so that a package could not possibly destroy a command from outside
-    commands[k] = utilities.deepcopy(v)
-    commands[k].exec = function(...) v.exec(...) end
+    commands[k] = v
+    if commands[k].custom then
+      if not plugins["custom commands"] then
+        plugins["custom commands"] = {}
+        plugins["custom commands"]["_help"] = "This plugin is a virtual plugin that holds aliases and custom commands"
+      end
+      table.insert(plugins["custom commands"],k)
+    end
   end
   return {
     plugins = plugins,
@@ -212,8 +217,7 @@ function Server:start()
       if not command then
         return
       end
-      --account for a special flag in command skeleton (hence the weird trickery above)
-      if (prefix_end == 0) and (not command.noprefix) then
+      if ((not command.noprefix) and prefix_end == 0) or (command.noprefix and prefix_end ~= 0) then
         return
       end
       if require("check_perms")(self,command,msg,discordia) then
