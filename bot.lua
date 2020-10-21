@@ -85,14 +85,14 @@ function Server:add_command(name,command_skeleton)
     self.commands[name] = command_skeleton
     return true
   else
-    self.log("error","Collision detected for command "..k.." on plugin "..name)
-    return nil,"Collision for command "..k
+    self.log("error","Collision detected for command "..name)
+    return nil,"Collision for command "..name
   end
 end
 
 function Server:remove_command(name)
   if self.commands[name] then
-    self.command[name] = nil
+    self.commands[name] = nil
     return true
   else
     return nil,"No such command name"
@@ -119,7 +119,7 @@ function Server:load_plugin(name)
       load = function(name) return self.load_plugin(self,name) end,
       unload = function(name) return self.unload_plugin(self,name) end,
       add_command = function(name,comm) return self.add_command(self,name,comm) end,
-      remove_command = function(name) return self.remove_command(self,comm) end
+      remove_command = function(name) return self.remove_command(self,name) end
     },
     discordia = discordia,
     require = require,
@@ -201,27 +201,39 @@ function Server:start()
   client:on("messageCreate",function(msg)
     --check if 1) message arrived on this server, 2) message isnt our own
     if require("check_partitioning").msg(msg,self.id,client.user.id) then
-      for k,v in pairs(self.commands) do
-        --check if it's the right command; check permission requirements, if provided
-        if (msg.content.." "):find(self.config.prefix..k.." ",1,true) == 1 and require("check_perms")(self,v,msg,discordia) then
-          --break down the message into arguments and options, match arguments if provided
-          local status,args,opts,err = require("air").parse(msg.content:sub((self.config.prefix..k):len()+1,-1),v.args,client,self.id)
-          if status then
-            self.log("INFO","Executing command "..k)
-            print_args = ""
-            for k,v in pairs(args) do
-              print_args = print_args..tostring(v).."; "
-            end
-            self.log("DEBUG","Args: "..print_args)
-            print_opts = ""
-            for k,v in pairs(opts) do
-              print_opts = print_opts..tostring(k)..": "..tostring(v).."\n"
-            end
-            self.log("DEBUG","Options: "..print_opts)
-            v.exec(msg,args,opts)
-          else
-            msg:reply(err)
+      --find the sanitized prefix. if it isn't found, skip the message.
+      local prefix_start,prefix_end = (msg.content.." "):find(self.config.prefix,1,true)
+      if not (prefix_start == 1) then
+        prefix_end = 0
+      end
+      --find the command name to look up
+      local name = msg.content:sub(prefix_end+1,-1):match("%S+")
+      local command = self.commands[name]
+      if not command then
+        return
+      end
+      --account for a special flag in command skeleton (hence the weird trickery above)
+      if (prefix_end == 0) and (not command.noprefix) then
+        return
+      end
+      if require("check_perms")(self,command,msg,discordia) then
+        --break down the message into arguments and options, match arguments if provided
+        local status,args,opts,err = require("air").parse(msg.content:sub((self.config.prefix..name):len()+1,-1),command.args,client,self.id)
+        if status then
+          self.log("INFO","Executing command "..name)
+          print_args = ""
+          for k,v in pairs(args) do
+            print_args = print_args..tostring(v).."; "
           end
+          self.log("DEBUG","Args: "..print_args)
+          print_opts = ""
+          for k,v in pairs(opts) do
+            print_opts = print_opts..tostring(k)..": "..tostring(v).."\n"
+          end
+          self.log("DEBUG","Options: "..print_opts)
+          command.exec(msg,args,opts)
+        else
+          msg:reply(err)
         end
       end
     end
