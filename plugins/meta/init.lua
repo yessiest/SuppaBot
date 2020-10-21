@@ -193,7 +193,7 @@ More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
         fields = (function()
           local fields = {}
           for k,v in pairs(map) do
-            table.insert(fields,{name = k,value = v})
+            table.insert(fields,{name = v["prefix"]..k,value = v["comm"]})
           end
           return fields
         end)()
