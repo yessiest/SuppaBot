@@ -146,7 +146,7 @@ More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
       }
     },
     exec = function(msg,args,opts)
-      if add_command(args[1],args[2],(opts["prefix"] or opts["p"])) then
+      if add_alias(args[1],args[2],(opts["prefix"] or opts["p"])) then
         msg:reply("Bound ``"..args[1].."`` as an alias to ``"..args[2].."``")
       else
         msg:reply("``"..args[1].."`` is already bound")
@@ -193,7 +193,7 @@ More at https://github.com/yessiest/SuppaBot/wiki/Tasks]]
         fields = (function()
           local fields = {}
           for k,v in pairs(map) do
-            table.insert(fields,{name = v["prefix"]..k,value = v["comm"]})
+            table.insert(fields,{name = ((v["prefix"] and "") or globals.prefix)..k,value = v["comm"]})
           end
           return fields
         end)()
