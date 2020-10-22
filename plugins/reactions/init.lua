@@ -252,6 +252,10 @@ segment.commands = {
 
 
 local buttonOn = function(message,hash,userID)
+  if not message then
+    log("ERROR","Attempted to find a deleted message")
+    return
+  end
   if segment.pivots[tostring(message.id)] and userID ~= client.user.id  then
     local current_pivot = segment.pivots[tostring(message.id)]
     if current_pivot.buttons[tostring(hash)] then
@@ -280,6 +284,10 @@ local buttonOn = function(message,hash,userID)
 end
 
 local buttonOff = function(message,hash,userID)
+  if not message then
+    log("ERROR","Attempted to find a deleted message")
+    return
+  end
   if segment.pivots[tostring(message.id)] and userID ~= client.user.id  then
     local current_pivot = segment.pivots[tostring(message.id)]
     if current_pivot.buttons[tostring(hash)] then
