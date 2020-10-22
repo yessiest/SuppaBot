@@ -48,9 +48,9 @@ return function(server,command,message,discordia)
     --4) check if the user is allowed to use the command
     if command.perms.users then
       permission_pass = command.perms.users[tostring(message.author.id)]
-      if permission_pass > 0 then
+      if permission_pass and permission_pass > 0 then
         return true
-      elseif permission_pass < 0 then
+      elseif permission_pass and permission_pass < 0 then
         return false
       end
     end
@@ -64,9 +64,9 @@ return function(server,command,message,discordia)
           end
         end
       end
-      if roles_pass > 0 then
+      if roles_pass and roles_pass > 0 then
         return true
-      elseif roles_pass < 0 then
+      elseif roles_pass and roles_pass < 0 then
         return false
       end
     end
