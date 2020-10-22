@@ -38,6 +38,11 @@ segment.commands = {
       "string",
       "string",
     },
+    perms = {
+      perms = {
+        "administrator"
+      }
+    }
     exec = function(msg,args,opts)
       local target,command = args[1],args[2]
       local commands = plugins.get()["commands"]
