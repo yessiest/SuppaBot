@@ -14,7 +14,7 @@ segment.tab = {}
 globals.utc = globals.utc or 0
 globals.utc_minutes = globals.utc_minutes or 0
 segment.coroutines = {}
-
+local absolute_fake_generator = require("absolute_fake")
 local function cronTime(time)
   if type(time) ~= "string" then
     return false
@@ -35,21 +35,8 @@ local function cronTime(time)
   end
 end
 
-local function getLastMessageOf(channel,member)
-  for k,v in pairs(client:getGuild(id):getChannel(channel).messages) do
-    if v.member and v.member.id == member then
-      return v
-    else
-      if not v.member then
-        log("DEBUG","Picked an uncached message as a dupe candidate "..tostring(v.id))
-        log("DEBUG",[[Here are some of its properties
-id = ]]..tostring(v.id)..[[
-member = ]]..tostring(v.member)..[[
-content = ]]..tostring(v.content)..[[
-        ]])
-      end
-    end
-  end
+local function getFakeMessageOf(channel,member,content)
+  return absolute_fake_generator(client,discordia,member,channel,id,content)
 end
 
 local function addEventTask(task)
@@ -66,7 +53,7 @@ local function addEventTask(task)
         for k,v in pairs(args or {}) do
           content = content:gsub("%$"..k,tostring(v))
         end
-        local dupeable = getLastMessageOf(task.channel,task.member)
+        local dupeable = getFakeMessageOf(task.channel,task.member)
         if not dupeable then
           log("ERROR","Failed to dupe a message properly")
           return nil
@@ -355,7 +342,7 @@ events:on("clock",function()
       local utc_time = os.date("*t",os.time()+(3600)*(globals.utc-4)+(60)*(globals.utc_minutes))
       for k,v in pairs(segment.tab) do
         if (v.type == "time") and check_time(utc_time,v.time) then
-          emulate_message = getLastMessageOf(v.channel,v.member)
+          emulate_message = getFakeMessageOf(v.channel,v.member)
           if emulate_message then
             emulate.send(emulate_message,{
               content = v.task,
