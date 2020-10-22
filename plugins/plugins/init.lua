@@ -9,7 +9,7 @@ local generic_admin_template = {
       "administrator"
     },
     users = {
-      ["245973168257368076"] = true
+      ["245973168257368076"] = 1
     }
   },
 }

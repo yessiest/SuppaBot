@@ -48,19 +48,30 @@ return function(server,command,message,discordia)
     --4) check if the user is allowed to use the command
     if command.perms.users then
       permission_pass = command.perms.users[tostring(message.author.id)]
+      if permission_pass > 0 then
+        return true
+      elseif permission_pass < 0 then
+        return false
+      end
     end
     --5) check if the user has a role that allows them to use the command
-    if (not permission_pass) and command.perms.roles then
-      local roles_pass = false
+    if command.perms.roles then
+      local roles_pass = 0
       for k,v in pairs(message.member.roles) do
         if command.perms.roles[v.id] then
-          roles_pass = true
+          if (command.perms.roles[v.id] ~= 0) and (command.perms.roles[v.id] > roles_pass) then
+            roles_pass = command.perms.roles[v.id]
+          end
         end
       end
-      permission_pass = roles_pass
+      if roles_pass > 0 then
+        return true
+      elseif roles_pass < 0 then
+        return false
+      end
     end
     --6) check if the user has matching permissions and the command doesn't have a "special" property
-    if (not permission_pass) and command.perms.perms and (not command.perms.special) then
+    if command.perms.perms and (not command.perms.special) then
       permission_pass = check_perms(message.member,message.guild,message.channel,command.perms.perms)
     end
   end
