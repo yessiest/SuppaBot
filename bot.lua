@@ -207,22 +207,26 @@ function Server:start()
     --check if 1) message arrived on this server, 2) message isnt our own
     if require("check_partitioning").msg(msg,self.id,client.user.id) then
       --find the sanitized prefix. if it isn't found, skip the message.
-      local prefix_start,prefix_end = (msg.content.." "):find(self.config.prefix,1,true)
-      if not (prefix_start == 1) then
-        prefix_end = 0
+      local command = nil
+      local prefix = ""
+      local name = ""
+      for k,v in pairs(self.commands) do
+        if v.noprefix then
+          if msg.content:find(k,1,true) == 1 then
+            command = v
+            name = k
+	  end
+        else
+          if msg.content:find(self.config.prefix..k,1,true) == 1 then
+            command = v
+	    name = k
+            prefix = self.config.prefix
+          end
+        end
       end
-      --find the command name to look up
-      local name = msg.content:sub(prefix_end+1,-1):match("%S+")
-      local command = self.commands[name]
-      if not command then
-        return
-      end
-      if ((not command.noprefix) and prefix_end == 0) or (command.noprefix and prefix_end ~= 0) then
-        return
-      end
-      if require("check_perms")(self,command,msg,discordia) then
+      if command and require("check_perms")(self,command,msg,discordia) then
         --break down the message into arguments and options, match arguments if provided
-        local status,args,opts,err = require("air").parse(msg.content:sub((self.config.prefix..name):len()+1,-1),command.args,client,self.id)
+        local status,args,opts,err = require("air").parse(msg.content:sub((prefix..name):len()+1,-1),command.args,client,self.id)
         if status then
           self.log("INFO","Executing command "..name)
           print_args = ""
