@@ -91,6 +91,7 @@ local function purify_strings(msg,input)
     text = text:gsub("<@(%D*)"..id..">",substitution)
   end
   text = text:gsub("@everyone","")
+  text = text:gsub("@here","")
   return text
 end
 
