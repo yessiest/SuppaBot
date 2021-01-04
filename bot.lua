@@ -212,12 +212,12 @@ function Server:start()
       local name = ""
       for k,v in pairs(self.commands) do
         if v.noprefix then
-          if msg.content:find(k,1,true) == 1 then
+          if (msg.content.." "):find(k.." ",1,true) == 1 then
             command = v
             name = k
 	  end
         else
-          if msg.content:find(self.config.prefix..k,1,true) == 1 then
+          if (msg.content.." "):find(self.config.prefix..k.." ",1,true) == 1 then
             command = v
 	    name = k
             prefix = self.config.prefix
