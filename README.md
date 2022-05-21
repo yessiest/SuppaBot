@@ -1,6 +1,6 @@
 # DEPRECATED
 
-This bot is no longer maintained, probably never will be. It's successor is 
+This bot is no longer maintained, probably never will be. Its successor is 
 https://github.com/512mb-org/512mb.org-bot - the official bot of the 512mb.org server
 
 # Suppa Bot
